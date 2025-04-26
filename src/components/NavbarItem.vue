@@ -89,6 +89,4 @@ const see = ref(false);
   z-index: 1001;
   width: 300px;
 }
-
-
 </style>
