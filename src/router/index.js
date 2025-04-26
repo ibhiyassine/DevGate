@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import LoginForm from '@/components/LoginForm.vue'
 import Profile from '@/components/Profile.vue'
 
 console.log('Router configuration loaded');
@@ -13,6 +14,16 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path:'/login',
+      name:'login',
+      component:LoginForm,
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: LoginForm
+    },
+  ],
       path: '/profile/:username',
       name: 'profile',
       component: Profile,
