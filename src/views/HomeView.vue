@@ -1,8 +1,9 @@
 <script setup>
+import NavBarItem from '@/components/NavbarItem.vue';
 </script>
 
 <template>
   <main>
-   This is the home view
+   <NavBarItem />
   </main>
 </template>

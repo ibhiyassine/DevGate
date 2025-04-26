@@ -1,9 +1,9 @@
 @import './base.css';
 :root {
     --primary-color: #F7F7F7;
-    --secondary-color: #93DEFF;
-    --background-color: #606470;
-    --text-color: #323643;
+    --secondary-color: #0071a1;
+    --background-color: #323643;
+    --text-color: #24232d ;
   }
   
   body {
