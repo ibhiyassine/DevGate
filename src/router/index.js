@@ -23,13 +23,15 @@ const router = createRouter({
       name: 'register',
       component: LoginForm
     },
-  ],
+    {
       path: '/profile/:username',
       name: 'profile',
       component: Profile,
       props: true
     }
-  ]
+  ],
+      
+  
 })
 
 export default router

@@ -1,13 +1,13 @@
 @import './base.css';
 :root {
-    --primary-color: #FAFAFA;
-    --secondary-color: #C7EEFF;
+    --primary-color: #F7F7F7;
+    --secondary-color: #0071A1;
     --accent-color: #0077C0;
     --dark-color: #1D242B;
-    --background-color: #FAFAFA;
-    --text-color: #323643;
+    --background-color: #323643;
+    --text-color: #24232D;
     --border-radius: 12px;
-    --shadow: 0 4px 16px rgba(0,0,0,0.08);
+    --shadow: 0 4px 16px var(--accent-color);
     --transition: all 0.2s cubic-bezier(.4,0,.2,1);
 }
 

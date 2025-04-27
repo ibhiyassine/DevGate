@@ -21,8 +21,7 @@ defineProps({
         <span class="username-badge">@{{ userData.username }}</span>
         <p class="bio">"{{ userData.bio }}"</p>
         <p class="email">
-          <span class="material-icons">mail</span>
-          <a :href="`mailto:${userData.email}`">{{ userData.email }}</a>
+          <a :href="`mailto:${userData.mail}`">Contact the person!</a>
         </p>
         <div class="profile-stats">
           <FollowersList :followers="userData.followers || []" />
@@ -102,7 +101,6 @@ defineProps({
 }
 
 .username-badge {
-  background: var(--secondary-color);
   color: var(--accent-color);
   border-radius: 8px;
   padding: 2px 10px;
@@ -112,6 +110,7 @@ defineProps({
 
 .profile-stats {
   display: flex;
+  color: white;
   flex-wrap: wrap;
   gap: 15px;
   margin-top: 15px;

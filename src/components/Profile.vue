@@ -7,6 +7,7 @@ import Skills from './Skills.vue'
 import Projects from './Projects.vue'
 import Objectives from './Objectives.vue'
 import ProfileInfo from './ProfileInfo.vue'
+import NavbarItem from './NavbarItem.vue'
 
 const route = useRoute()
 const userData = ref(null)
@@ -40,11 +41,12 @@ watch(() => route.params.username, fetchUserData)
 </script>
 
 <template>
-  <div class="profile">
+  <NavbarItem />
+  <div class="profile ">
     <div v-if="loading" class="loading">
       <div class="loading-spinner"></div>
       <p>Loading profile...</p>
-    </div>
+    </div>    
     
     <div v-else-if="error" class="error">
       <div class="error-container">
@@ -192,4 +194,6 @@ watch(() => route.params.username, fetchUserData)
     padding: 20px;
   }
 }
+
+
 </style>

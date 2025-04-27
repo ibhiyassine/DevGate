@@ -20,7 +20,7 @@ const closeModal = () => {
 </script>
 
 <template>
-  <span class="stat followers-stat" @click="openModal" style="cursor:pointer;">
+  <span class="stat followers-stat"  @click="openModal" style="cursor:pointer; color: white;">
     <span class="material-icons">group</span>
     {{ followers?.length || 0 }} Followers
   </span>
@@ -48,6 +48,7 @@ const closeModal = () => {
   align-items: center;
   gap: 5px;
   background: var(--secondary-color);
+  color: white;
   border-radius: 8px;
   padding: 4px 10px;
   font-size: 0.95em;
