@@ -71,6 +71,6 @@ onMounted(async () => {
   position: -webkit-sticky;
   position: sticky;
   top: 80px;
-  z-index: 1020;
+  z-index: 2;
 }
 </style>
