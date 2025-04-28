@@ -25,6 +25,7 @@ export async function getActivities() {
             .forEach(skill => {
             Data.push({
                 type:'skill',
+                modifiedDate: skill.modifiedDate,
                 user: userData,
                 skill: skill
             });
@@ -36,6 +37,7 @@ export async function getActivities() {
             .forEach(project => {
             Data.push({
                 type:'project',
+                modifiedDate: project.modifiedDate,
                 user: userData,
                 project: project
             });
@@ -48,11 +50,12 @@ export async function getActivities() {
             .forEach(objectif => {
             Data.push({
                 type:'objectif',
+                modifiedDate: objectif.modifiedDate,
                 user: userData,
                 objectif: objectif
             });
             });
     }
-    
+    Data.sort((a, b) => a.modifiedDate - b.modifiedDate);
     return Data;
 }

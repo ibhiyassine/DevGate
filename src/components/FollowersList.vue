@@ -31,9 +31,9 @@ const closeModal = () => {
       <button class="close-btn" @click="closeModal">&times;</button>
       <ul v-if="followers?.length" class="followers-list">
         <li v-for="follower in followers" :key="follower" class="follower-item">
-          <RouterLink :to="'/profile/' + follower" @click="closeModal">
+          <RouterLink :to="'/profile/' + follower.id" @click="closeModal">
             <span class="material-icons">person</span>
-            {{ follower }}
+            {{ follower.id }}
           </RouterLink>
         </li>
       </ul>
