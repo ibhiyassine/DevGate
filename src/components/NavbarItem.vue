@@ -27,7 +27,7 @@ const see = ref(false);
       
       <div class="d-flex gap-2 align-items-center w-100 p-2">
         <router-link to="/">
-          <img src="../assets/logo3.png"  width="140px" height="60px" alt="Logo" />
+          <img src="../assets/logo3.png"  width="140px" height="70px" alt="Logo" />
         </router-link>
         <search-bar />
       </div>

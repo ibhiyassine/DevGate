@@ -19,9 +19,10 @@ defineProps({
       <div class="profile-details">
         <h1>{{ userData.fullname }}</h1>
         <span class="username-badge">@{{ userData.username }}</span>
-        <p class="bio">"{{ userData.bio }}"</p>
+        <p v-if="userData.bio" class="bio">"{{ userData.bio }}"</p>
+        <p class="bio" v-else>No bio is available</p>
         <p class="email">
-          <a :href="`mailto:${userData.mail}`">Contact the person!</a>
+          <a :href="`mailto:${userData.email}`">Contact the person!</a>
         </p>
         <div class="profile-stats">
           <FollowersList :followers="userData.followers || []" />

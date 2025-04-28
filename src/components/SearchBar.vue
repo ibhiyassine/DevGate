@@ -89,7 +89,7 @@ const handleBlur = () => {
 }
 
 input[type="text"] {
-  background-color: rgb(229, 219, 219);
+  background-color: rgb(185, 200, 232);
 }
 
 input[type="text"]:focus {

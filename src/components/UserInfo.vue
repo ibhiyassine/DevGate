@@ -26,7 +26,7 @@ async function logout2() {
 const userInfo = ref(null);
 onBeforeMount(async () => {
         userInfo.value = await getUserInfo(props.username);
-        console.log("aa",userInfo.value.mail);
+        console.log("aa",userInfo.value.email);
 
 });
 
@@ -42,7 +42,7 @@ let date_string = computed(() => {
           
           <template v-if="userInfo">
             <span class="name mt-2">{{ userInfo.username }}</span>
-            <span class="idd">{{ userInfo.mail }}</span>
+            <span class="idd">{{ userInfo.email }}</span>
   
            
   
@@ -104,6 +104,7 @@ body {
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: none !important;
 }
 
 .logout-btn-outline:hover {
