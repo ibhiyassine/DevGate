@@ -33,7 +33,7 @@ async function submitLogReg() {
   }
   if (isLogin.value) {
     errorMessage.value = await loginUser(username.value, password.value);
-    router.replace(`/home`);
+    router.replace(`/`);
   }
   else {
     if (await checkUsername(username.value)) {
@@ -44,7 +44,7 @@ async function submitLogReg() {
           await updateProfile(user, { displayName: username.value });
           console.log("User created", user);
           await addUsername(username.value, email.value,FullName.value);
-          router.replace(`/home`);
+          router.replace(`/`);
           // ...
         })
         .catch((error) => {

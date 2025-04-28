@@ -12,7 +12,7 @@ export async function loginUser(username, password) {
             return "User not found.";
         }
 
-        const userData = userDoc.get("mail");
+        const userData = userDoc.get("email");
 
         // Use the email from the user document to sign in
         const userCredential = await signInWithEmailAndPassword(
