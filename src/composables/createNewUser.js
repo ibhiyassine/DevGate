@@ -7,7 +7,7 @@ export async function checkUsername(username) {
     return !(userRef.get("username") == username);    
 }
 
-export async function addUsername(username, mail) {
+export async function addUsername(username, mail,FullName) {
     let user = {
         createdAt: Timestamp.fromDate(new Date()),
         email: mail,
@@ -15,6 +15,7 @@ export async function addUsername(username, mail) {
         followings:[],
         followers:[],
         programCounter:0,
+        FullName:FullName,
 
     };
     try{

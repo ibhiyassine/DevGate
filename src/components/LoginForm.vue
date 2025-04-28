@@ -12,6 +12,7 @@ const auth = getAuth();
 const isLogin = computed(() => route.path === '/login')
 
 const email = ref('')
+const FullName=ref('')
 const password = ref('')
 const username = ref('')
 const showPassword = ref(false)
@@ -42,7 +43,7 @@ async function submitLogReg() {
           const user = userCredential.user;
           await updateProfile(user, { displayName: username.value });
           console.log("User created", user);
-          await addUsername(username.value, email.value);
+          await addUsername(username.value, email.value,FullName.value);
           router.replace(`/home`);
           // ...
         })
@@ -88,6 +89,10 @@ async function submitLogReg() {
             <div class="form-group">
               <label for="email">Email</label>
               <input id="email" type="email" v-model="email" placeholder="Enter your email" required />
+            </div>
+            <div class="form-group">
+              <label for="FullName">Full Name</label>
+              <input id="FullName" type="FullName" v-model="FullName" placeholder="Enter your full name" required />
             </div>
           </template>
           
