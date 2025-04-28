@@ -5,6 +5,7 @@ import HomeView from '../views/HomeView.vue'
 import LoginForm from '@/components/LoginForm.vue'
 import Profile from '@/components/Profile.vue'
 import DashboardView from '../views/DashboardView.vue'
+import { authStateListener } from '@/composables/authStateListener'
 
 
 
@@ -41,16 +42,17 @@ const router = createRouter({
   ],
 })
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = !!auth.currentUser;
-
   if (to.name === "dashboard") {
-      auth.onAuthStateChanged(async (user) => {
-          if (!user) {
-             next({name: "login"});
-          } 
-      });
+    authStateListener((user) => {
+      if(!user){
+        next({name: "login"});
+      }
+      else{
+        next();
+      }
+    })
   } 
-  else if ((to.name === "profile" || to.name === "home") && !isAuthenticated) {  
+  else if ((to.name === "home")) {  
       // Wait for Firebase to initialize auth state
       auth.onAuthStateChanged((user) => {
           if (user) {
@@ -60,11 +62,15 @@ router.beforeEach((to, from, next) => {
           }
       });
   }
-  else if((to.name==="profile" && auth.currentUser.displayName == to.params.username)){
-
-    console.log(auth.currentUser.displayName,to.params.username);
-    next({name : "dashboard"});
-
+  else if((to.name==="profile")){
+    authStateListener((user) => {
+      if(user && auth.currentUser.displayName === to.params.username){
+        next({name : "dashboard"});
+      }
+      else{
+        next();
+      }
+    });
   }
   else {
       next(); // Proceed for all other routes
