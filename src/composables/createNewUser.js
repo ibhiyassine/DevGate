@@ -10,9 +10,9 @@ export async function checkUsername(username) {
 export async function addUsername(username, mail) {
     let user = {
         createdAt: Timestamp.fromDate(new Date()),
-        mail: mail,
+        email: mail,
         username: username,
-        connection:[],
+        followings:[],
         followers:[],
         programCounter:0,
 
@@ -22,13 +22,13 @@ export async function addUsername(username, mail) {
        await setDoc(doc(db, "users", username), user);
 
         const objectifRef = collection(db, "users", username, "objectifs");
-        await addDoc(objectifRef, {
+        await setDoc(doc(objectifRef, "init"), {
             initialized: true,
         });
         const projetcRef = collection(db, "users", username, "projects");
-        await addDoc(projetcRef, { initialized: true });
+        await setDoc(doc(projetcRef, "init"), { initialized: true });
         const skillRef = collection(db, "users", username, "skills");
-        await addDoc(skillRef, { initialized: true });
+        await setDoc(doc(skillRef, "init"), { initialized: true });
     }
     catch(e){
         console.error("YASSINE USER CAN'T BE CREATED", e);
