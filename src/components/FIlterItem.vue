@@ -1,6 +1,13 @@
 <script setup>
 import { getActivities } from '../composables/getActivities'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
+
+const emits = defineEmits(['skill', 'project', 'objectif', 'friend']);
+
+let skill = ref(true);
+let project = ref(true);
+let objectif = ref(true);
+let friend = ref(false);
 
 onMounted(async () => {
   const activities = await getActivities()
@@ -23,7 +30,7 @@ onMounted(async () => {
     <ul class="dropdown-menu">
       <li>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="" id="check1" checked />
+          <input class="form-check-input" type="checkbox" value="" id="check1" v-model="skill" @change="emits('skill', skill)"/>
           <label class="form-check-label position-relative w-100" for="check1">
     By Skills
     <span class="material-icons position-absolute end-0">psychology</span>
@@ -32,21 +39,21 @@ onMounted(async () => {
       </li>
       <li>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="" id="check2" checked />
+          <input class="form-check-input" type="checkbox" value="" id="check2" v-model="objectif" @change="emits('objectif', objectif)" />
           <label class="form-check-label position-relative w-100" for="check2"> By Objectifs </label>
           <span class="material-icons position-absolute end-0"> calendar_month </span>
         </div>
       </li>
       <li>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="" id="check3" checked />
+          <input class="form-check-input" type="checkbox" value="" id="check3" v-model="project" @change="emits('project', project)" />
           <label class="form-check-label position-relative w-100" for="check3"> By projects </label>
           <span class="material-icons position-absolute end-0"> work </span>
         </div>
       </li>
       <li>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="" id="check3" checked />
+          <input class="form-check-input" type="checkbox" value="" id="check3" v-model="friend" @change="emits('friend', friend)"/>
           <label class="form-check-label position-relative w-100" for="check3"> By Friends </label>
           <span class="material-icons position-absolute end-0"> diversity_3 </span>
         </div>
