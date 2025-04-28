@@ -7,42 +7,35 @@ import { Timestamp } from "firebase/firestore";
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
 const props = defineProps({
-    username: {
-        type: String,
-        required: true,
-        default: "yassine",
-    },
     type: {
         type: String,
         required: true,
-        default: "objectives",
+        default: "objectif",
     },
-    createdAt: {
-        type: Timestamp,
+    user: {
+        type: Object,
     },
-    modifiedDate: {
-        type: Timestamp,
-        default: Timestamp.fromDate(new Date())
+    skill: {
+        type: Object,
     },
-    description: {
-        type: String,
-        default: "This is the description",
+    project: {
+        type: Object,
     },
-    title: {
-        type: String,
-        default: "this is a title",
-    },
-    level: {
-        type: Number,
-        default: 1,
-    },
-    status: {
-        type: Number,
-        default: 1,
-    },
+    objectif: {
+        type: Object,
+    }
 });
 
-let date = computed(() => get_date_string(props.modifiedDate));
+let date = computed(() => {
+    if(props.type === 'skill')
+        return get_date_string(props.skill.modifiedDate);
+    else if(props.type === 'objectif')
+        return get_date_string(props.objectif.modifiedDate);
+    else if(props.type === 'project')
+        return get_date_string(props.project.modifiedDate);
+    else
+        return "no date";
+    });
 </script>
 
 <template>
@@ -53,8 +46,8 @@ let date = computed(() => get_date_string(props.modifiedDate));
             </div>
             <div>
                 <div class="d-flex gap-1 align-items-center">
-                    <router-link :to="`/profile/${username}`" class="d-block fw-bold text-black router">
-                        {{ username }}
+                    <router-link :to="`/profile/${user.username}`" class="d-block fw-bold text-black router">
+                        {{ user.username }}
                     </router-link>
                     <span class="d-block text-secondary" style="font-size: 0.9rem;">modified something</span>
                 </div>
@@ -64,9 +57,9 @@ let date = computed(() => get_date_string(props.modifiedDate));
             </div>
         </div>
         <!--Here goes the content-->
-        <skill-subcard v-if="type=='skills'"/>
-        <project-subcard v-else-if="type=='projects'"/>
-        <objectives-subcard v-else-if="type=='objectives'"/>
+        <skill-subcard v-if="type=='skill'" v-bind="skill" />
+        <project-subcard v-else-if="type=='project'" v-bind="project"/>
+        <objectives-subcard v-else-if="type=='objectif'" v-bind="objectif"/>
     </div>
 </template>
 
