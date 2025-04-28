@@ -36,6 +36,7 @@ const props = defineProps({
             <a :href="githubLink" class="fs-5 fw-bold">{{ title }}</a>
         </div>
         <div class="project-content">
+            
             <p class="project-description border p-2 rounded bg-white">{{ description || 'No description available' }}</p>
             <div class="project-stack">
                 <span v-for="(tech, idx) in (stack || [])" :key="idx" class="stack-chip">{{ tech }}</span>
@@ -50,6 +51,7 @@ const props = defineProps({
                     {{ modifiedDate.toDate ? modifiedDate.toDate().toLocaleDateString() :
                         modifiedDate }}
                 </span>
+                
             </div>
         </div>
     </div>

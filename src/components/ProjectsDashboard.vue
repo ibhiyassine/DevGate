@@ -63,6 +63,7 @@ onMounted(fetchProjects);
         </div>
         
         <div v-if="expandedProjects.has(project.id)" class="project-content">
+            
           <p class="project-description">{{ project.description || 'No description available' }}</p>
           <div class="project-stack">
             <span v-for="(tech, idx) in (project.stack || [])" :key="idx" class="stack-chip">{{ tech }}</span>
@@ -81,6 +82,10 @@ onMounted(fetchProjects);
               <span class="material-icons">update</span>
               {{ project.modifiedDate.toDate ? project.modifiedDate.toDate().toLocaleDateString() : project.modifiedDate }}
             </span>
+            <div class="style d-flex gap-2">
+                <span class="material-icons style2">edit</span>
+                <span class="material-icons style "> delete </span>
+            </div>
           </div>
         </div>
       </div>
@@ -187,5 +192,22 @@ button {
   margin-bottom: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   overflow: hidden;
+}
+.style {
+    color: rgb(230, 108, 108);
+    margin-left: auto;
+    cursor: pointer;
+}
+.style:hover{
+    color:red;
+    cursor: pointer;
+}
+.style2{
+    color:rgb(132, 222, 132);
+    margin-left: auto;
+    cursor: pointer;
+}
+.style2:hover{
+    color: green;
 }
 </style> 
