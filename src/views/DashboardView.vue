@@ -21,9 +21,9 @@ const error = ref(null);
 const username = computed(() => currentUser.value?.displayName?.toLowerCase().replace(/\s+/g, ''));
 
 // Initialize composables
-const { showSkillForm, newSkill, addSkill } = useSkills(username);
-const { showProjectForm, newProject, addProject } = useProjects(username);
-const { showObjectiveForm, newObjective, addObjective } = useObjectives(username);
+const { showSkillForm, newSkill, addSkill } = useSkills(() => username.value);
+const { showProjectForm, newProject, addProject } = useProjects(() => username.value);
+const { showObjectiveForm, newObjective, addObjective } = useObjectives(() => username.value);
 
 const fetchUserData = async () => {
   try {

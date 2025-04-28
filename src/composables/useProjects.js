@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { db } from '@/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
-export function useProjects(username) {
+export function useProjects(getUsername) {
   const showProjectForm = ref(false);
   const newProject = ref({
     title: '',
@@ -15,6 +15,11 @@ export function useProjects(username) {
 
   const addProject = async () => {
     try {
+      const username = getUsername();
+      if (!username) {
+        console.error('Username is not available');
+        return;
+      }
       const projectsRef = collection(db, 'users', username, 'projects');
       await addDoc(projectsRef, {
         ...newProject.value,

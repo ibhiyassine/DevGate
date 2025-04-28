@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { db } from '@/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
-export function useSkills(username) {
+export function useSkills(getUsername) {
   const showSkillForm = ref(false);
   const newSkill = ref({
     title: '',
@@ -13,6 +13,11 @@ export function useSkills(username) {
 
   const addSkill = async () => {
     try {
+      const username = getUsername();
+      if (!username) {
+        console.error('Username is not available');
+        return;
+      }
       const skillsRef = collection(db, 'users', username, 'skills');
       await addDoc(skillsRef, {
         ...newSkill.value,

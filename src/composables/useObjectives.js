@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { db } from '@/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
-export function useObjectives(username) {
+export function useObjectives(getUsername) {
   const showObjectiveForm = ref(false);
   const newObjective = ref({
     title: '',
@@ -13,6 +13,11 @@ export function useObjectives(username) {
 
   const addObjective = async () => {
     try {
+      const username = getUsername();
+      if (!username) {
+        console.error('Username is not available');
+        return;
+      }
       const objectivesRef = collection(db, 'users', username, 'objectifs');
       const objectiveData = {
         ...newObjective.value,
