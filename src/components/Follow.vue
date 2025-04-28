@@ -16,6 +16,8 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['follow', 'unfollow'])
+
 const isFollowing = ref(false)
 const isLoading = ref(true)
 
@@ -25,7 +27,11 @@ const checkFollowStatus = async () => {
     const currentUserDoc = await getDoc(doc(db, 'users', props.currentUsername))
     if (currentUserDoc.exists()) {
       const followings = currentUserDoc.data().followings || []
-      isFollowing.value = followings.includes(props.targetUsername)
+      // Check if the target user's document reference is in the followings array
+      const targetUserRef = doc(db, 'users', props.targetUsername)
+      isFollowing.value = followings.some(
+        (following) => following.path === targetUserRef.path
+      )
     }
   } catch (error) {
     console.error('Error checking follow status:', error)
@@ -50,19 +56,21 @@ const toggleFollow = async () => {
     if (isFollowing.value) {
       // Unfollow: Remove from followings and followers
       batch.update(currentUserRef, {
-        followings: arrayRemove(props.targetUsername)
+        followings: arrayRemove(targetUserRef)
       })
       batch.update(targetUserRef, {
-        followers: arrayRemove(props.currentUsername)
+        followers: arrayRemove(currentUserRef)
       })
+      emit('unfollow', props.targetUsername)
     } else {
       // Follow: Add to followings and followers
       batch.update(currentUserRef, {
-        followings: arrayUnion(props.targetUsername)
+        followings: arrayUnion(targetUserRef)
       })
       batch.update(targetUserRef, {
-        followers: arrayUnion(props.currentUsername)
+        followers: arrayUnion(currentUserRef)
       })
+      emit('follow', props.currentUsername)
     }
 
     // Commit the batch
@@ -83,16 +91,16 @@ onMounted(checkFollowStatus)
 
 <template>
   <button 
+    v-if="currentUsername !== targetUsername"
     @click="toggleFollow" 
-    :disabled="isLoading || currentUsername === targetUsername"
+    :disabled="isLoading"
     :class="[
       'follow-button',
       isFollowing ? 'following' : 'not-following',
-      isLoading ? 'loading' : '',
-      currentUsername === targetUsername ? 'disabled' : ''
+      isLoading ? 'loading' : ''
     ]"
   >
-    <span v-if="currentUsername != targetUsername">
+    <span>
       {{ isLoading ? 'Loading...' : (isFollowing ? 'Unfollow' : 'Follow') }}
     </span>
   </button>

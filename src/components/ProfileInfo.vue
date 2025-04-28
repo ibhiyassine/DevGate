@@ -1,11 +1,123 @@
 <script setup>
 import FollowersList from './FollowersList.vue'
 import FollowingsList from './FollowingsList.vue'
+import Follow from './Follow.vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { db } from '../firebase'
+import { doc, updateDoc, onSnapshot } from 'firebase/firestore'
+import { authStateListener } from '@/composables/authStateListener'
 
-defineProps({
+const props = defineProps({
   userData: {
     type: Object,
     required: true
+  },
+  isDashboard: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const isEditingBio = ref(false)
+const isEditingHours = ref(false)
+const editedBio = ref('')
+const editedHours = ref(0)
+const currentBio = ref('')
+const currentHours = ref(0)
+let unsubscribe = null
+const currentUser = ref(null)
+
+const startEditingBio = () => {
+  editedBio.value = currentBio.value
+  isEditingBio.value = true
+}
+
+const startEditingHours = () => {
+  editedHours.value = currentHours.value
+  isEditingHours.value = true
+}
+
+const cancelEditingBio = () => {
+  isEditingBio.value = false
+  editedBio.value = ''
+}
+
+const cancelEditingHours = () => {
+  isEditingHours.value = false
+  editedHours.value = 0
+}
+
+const updateBio = async () => {
+  try {
+    const userRef = doc(db, 'users', props.userData.username)
+    await updateDoc(userRef, {
+      bio: editedBio.value,
+      modifiedDate: new Date()
+    })
+    isEditingBio.value = false
+  } catch (err) {
+    console.error('Error updating bio:', err)
+  }
+}
+
+const updateHours = async () => {
+  try {
+    const userRef = doc(db, 'users', props.userData.username)
+    await updateDoc(userRef, {
+      programCounter: parseInt(editedHours.value),
+      modifiedDate: new Date()
+    })
+    currentHours.value = parseInt(editedHours.value)
+    isEditingHours.value = false
+  } catch (err) {
+    console.error('Error updating programming hours:', err)
+  }
+}
+
+const setupUserListener = () => {
+  if (unsubscribe) {
+    unsubscribe()
+  }
+
+  const userRef = doc(db, 'users', props.userData.username)
+  unsubscribe = onSnapshot(userRef, (doc) => {
+    if (doc.exists()) {
+      currentBio.value = doc.data().bio || ''
+      currentHours.value = doc.data().programCounter || 0
+    }
+  })
+}
+
+const handleFollow = (username) => {
+  if (!props.userData.followers) {
+    props.userData.followers = []
+  }
+  props.userData.followers.push({ id: username })
+  if (props.userData.followersCount === undefined) {
+    props.userData.followersCount = 0
+  }
+  props.userData.followersCount++
+}
+
+const handleUnfollow = (username) => {
+  if (props.userData.followers) {
+    props.userData.followers = props.userData.followers.filter(follower => follower.id !== username)
+    if (props.userData.followersCount > 0) {
+      props.userData.followersCount--
+    }
+  }
+}
+
+onMounted(() => {
+  setupUserListener()
+  authStateListener((user) => {
+    currentUser.value = user
+  })
+})
+
+onUnmounted(() => {
+  if (unsubscribe) {
+    unsubscribe()
   }
 })
 </script>
@@ -14,23 +126,81 @@ defineProps({
   <div class="profile-left">
     <div class="profile-header">
       <div class="profile-avatar">
-        {{ userData.fullname ? userData.fullname[0].toUpperCase() : '?' }}
+        {{ userData.username ? userData.username[0].toUpperCase() : '?' }}
       </div>
       <div class="profile-details">
         <h1>{{ userData.fullname }}</h1>
-        <span class="username-badge">@{{ userData.username }}</span>
-        <p v-if="userData.bio" class="bio">"{{ userData.bio }}"</p>
-        <p class="bio" v-else>No bio is available</p>
+        <div class="username-section">
+          <span class="username-badge">@{{ userData.username }}</span>
+          <Follow 
+            v-if="!isDashboard && currentUser" 
+            :targetUsername="userData.username" 
+            :currentUsername="currentUser.displayName.toLowerCase().replace(/\s+/g, '')"
+            @follow="handleFollow"
+            @unfollow="handleUnfollow"
+          />
+        </div>
+        <div class="bio-section">
+          <template v-if="isEditingBio">
+            <textarea 
+              v-model="editedBio" 
+              class="bio-edit" 
+              placeholder="Enter your bio"
+              rows="3"
+            ></textarea>
+            <div class="bio-actions">
+              <button @click="updateBio" class="save-btn">Save</button>
+              <button @click="cancelEditingBio" class="cancel-btn">Cancel</button>
+            </div>
+          </template>
+          <template v-else>
+            <p v-if="currentBio" class="bio">"{{ currentBio }}"</p>
+            <p class="bio" v-else>No bio is available</p>
+            <button v-if="isDashboard" @click="startEditingBio" class="edit-bio-btn">
+              <span class="material-icons">edit</span>
+            </button>
+          </template>
+        </div>
         <p class="email">
           <a :href="`mailto:${userData.email}`">Contact the person!</a>
         </p>
         <div class="profile-stats">
-          <FollowersList :followers="userData.followers || []" />
-          <FollowingsList :followings="userData.followings || []" />
+          <FollowersList 
+            :followers="userData.followers || []" 
+            :username="userData.username"
+          />
+          <FollowingsList 
+            :followings="userData.followings || []" 
+            :username="userData.username"
+          />
 
           <span class="stat">
-            <span class="material-icons">star</span>
-            Level {{ userData.programCounter || 0 }}
+            <span class="material-icons">code</span>
+            <div class="programming-hours">
+              <template v-if="isEditingHours">
+                <input 
+                  type="number" 
+                  v-model="editedHours" 
+                  class="hours-input"
+                  min="0"
+                />
+                <div class="hours-actions">
+                  <button @click="updateHours" class="save-btn">Save</button>
+                  <button @click="cancelEditingHours" class="cancel-btn">Cancel</button>
+                </div>
+              </template>
+              <template v-else>
+                <span class="hours">{{ currentHours }}</span>
+                <span class="label">hours</span>
+                <button 
+                  v-if="isDashboard" 
+                  @click="startEditingHours" 
+                  class="edit-hours-btn"
+                >
+                  <span class="material-icons">edit</span>
+                </button>
+              </template>
+            </div>
           </span>
           <span class="stat">
             <span class="material-icons">calendar_today</span>
@@ -79,11 +249,86 @@ defineProps({
   font-size: 1.8em;
 }
 
+.username-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.username-badge {
+  color: var(--accent-color);
+  border-radius: 8px;
+  padding: 2px 10px;
+  font-size: 0.95em;
+}
+
+.bio-section {
+  position: relative;
+  margin: 0 0 15px 0;
+}
+
 .bio {
   color: var(--dark-color);
   font-size: 1.1em;
-  margin: 0 0 15px 0;
   line-height: 1.6;
+  margin: 0;
+}
+
+.bio-edit {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--secondary-color);
+  border-radius: var(--border-radius);
+  background: var(--background-color);
+  color: white;
+  font-size: 1.1em;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.bio-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.save-btn, .cancel-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.save-btn {
+  background: var(--accent-color);
+  color: white;
+}
+
+.cancel-btn {
+  background: var(--secondary-color);
+  color: var(--text-color);
+}
+
+.edit-bio-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.edit-bio-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .email {
@@ -101,14 +346,6 @@ defineProps({
   font-size: 1.2em;
 }
 
-.username-badge {
-  color: var(--accent-color);
-  border-radius: 8px;
-  padding: 2px 10px;
-  font-size: 0.95em;
-  margin-left: 8px;
-}
-
 .profile-stats {
   display: flex;
   color: white;
@@ -120,11 +357,57 @@ defineProps({
 .profile-stats .stat {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
   background: var(--secondary-color);
   border-radius: 8px;
-  padding: 4px 10px;
+  padding: 8px 12px;
   font-size: 0.95em;
+}
+
+.programming-hours {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  position: relative;
+}
+
+.hours-input {
+  width: 80px;
+  padding: 4px 8px;
+  border: 1px solid var(--secondary-color);
+  border-radius: 4px;
+  background: var(--background-color);
+  color: white;
+  text-align: center;
+}
+
+.hours-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.hours-actions button {
+  padding: 4px 8px;
+  font-size: 0.8em;
+}
+
+.edit-hours-btn {
+  position: absolute;
+  top: 0;
+  right: -25px;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.edit-hours-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .profile-details .email {
@@ -144,6 +427,12 @@ defineProps({
 .profile-details .email a:hover {
   color: var(--dark-color);
   text-decoration: underline;
+}
+
+:deep(.follow-button) {
+  padding: 6px 16px;
+  font-size: 0.9em;
+  margin: 0;
 }
 
 @media (max-width: 1024px) {

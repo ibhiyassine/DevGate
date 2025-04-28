@@ -1,11 +1,17 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
 import { fetchUserSubcollection } from '../composables/fetchData.js';
+import { db } from '../firebase';
+import { collection, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 const props = defineProps({
   username: {
     type: String,
     required: true
+  },
+  isDashboard: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -13,8 +19,19 @@ const projects = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const expandedProjects = ref(new Set());
+let unsubscribe = null;
+const editingProject = ref(null);
+const editedTitle = ref('');
+const editedDescription = ref('');
+const editedStack = ref('');
+const editedGithubLink = ref('');
+
+const validProjects = computed(() => {
+  return projects.value.filter(project => project.title && project.title.trim() !== '');
+});
 
 const toggleProject = (projectId) => {
+  if (editingProject.value === projectId) return;
   if (expandedProjects.value.has(projectId)) {
     expandedProjects.value.delete(projectId);
   } else {
@@ -22,19 +39,83 @@ const toggleProject = (projectId) => {
   }
 };
 
-const fetchProjects = async () => {
+const startEditing = (project) => {
+  editingProject.value = project.id;
+  editedTitle.value = project.title;
+  editedDescription.value = project.description || '';
+  editedStack.value = project.stack ? project.stack.join(', ') : '';
+  editedGithubLink.value = project.githubLink || '';
+  expandedProjects.value.add(project.id);
+};
+
+const cancelEditing = () => {
+  editingProject.value = null;
+  editedTitle.value = '';
+  editedDescription.value = '';
+  editedStack.value = '';
+  editedGithubLink.value = '';
+};
+
+const updateProject = async (projectId) => {
   try {
-    loading.value = true;
-    projects.value = await fetchUserSubcollection(props.username, 'projects');
+    const projectRef = doc(db, 'users', props.username, 'projects', projectId);
+    await updateDoc(projectRef, {
+      title: editedTitle.value,
+      description: editedDescription.value,
+      stack: editedStack.value.split(',').map(tech => tech.trim()),
+      githubLink: editedGithubLink.value,
+      modifiedDate: new Date()
+    });
+    editingProject.value = null;
   } catch (err) {
-    console.error('Error fetching projects:', err);
-    error.value = err.message || 'Failed to load projects';
-  } finally {
-    loading.value = false;
+    console.error('Error updating project:', err);
+    error.value = 'Failed to update project';
   }
 };
 
-onMounted(fetchProjects);
+const deleteProject = async (projectId) => {
+  try {
+    const projectRef = doc(db, 'users', props.username, 'projects', projectId);
+    await deleteDoc(projectRef);
+  } catch (err) {
+    console.error('Error deleting project:', err);
+    error.value = 'Failed to delete project';
+  }
+};
+
+const setupProjectsListener = () => {
+  if (unsubscribe) {
+    unsubscribe();
+  }
+
+  const projectsRef = collection(db, 'users', props.username, 'projects');
+  unsubscribe = onSnapshot(projectsRef, (snapshot) => {
+    projects.value = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    loading.value = false;
+  }, (err) => {
+    console.error('Error listening to projects:', err);
+    error.value = err.message || 'Failed to load projects';
+    loading.value = false;
+  });
+};
+
+onMounted(() => {
+  setupProjectsListener();
+});
+
+onUnmounted(() => {
+  if (unsubscribe) {
+    unsubscribe();
+  }
+});
+
+watch(() => props.username, () => {
+  loading.value = true;
+  setupProjectsListener();
+});
 </script>
 
 <template>
@@ -45,31 +126,56 @@ onMounted(fetchProjects);
     
     <div v-else-if="error">
       <p>Error: {{ error }}</p>
-      <button @click="fetchProjects">Try Again</button>
+      <button @click="setupProjectsListener">Try Again</button>
     </div>
     
-    <div v-else-if="projects.length > 0">
-      <div v-for="project in projects" :key="project.id" class="project-card">
+    <div v-else-if="validProjects.length > 0">
+      <div v-for="project in validProjects" :key="project.id" class="project-card">
         <div class="project-header" @click="toggleProject(project.id)">
           <div class="project-icon">
-            <span class="material-icons">{{ project.icon || 'folder' }}</span>
+            <span class="material-icons">folder</span>
           </div>
           <h4 class="project-title">{{ project.title }}</h4>
-          <span class="material-icons expand-icon">
-            {{ expandedProjects.has(project.id) ? 'expand_less' : 'expand_more' }}
-          </span>
+          <div v-if="isDashboard" class="project-actions">
+            <button @click.stop="startEditing(project)" class="edit-btn">
+              <span class="material-icons">edit</span>
+            </button>
+            <button @click.stop="deleteProject(project.id)" class="delete-btn">
+              <span class="material-icons">delete</span>
+            </button>
+            <span class="material-icons expand-icon">
+              {{ expandedProjects.has(project.id) ? 'expand_less' : 'expand_more' }}
+            </span>
+          </div>
+          <div v-else class="project-actions">
+            <span class="material-icons expand-icon">
+              {{ expandedProjects.has(project.id) ? 'expand_less' : 'expand_more' }}
+            </span>
+          </div>
         </div>
         
         <div v-if="expandedProjects.has(project.id)" class="project-content">
-          <p class="project-description">{{ project.description || 'No description available' }}</p>
-          <div class="project-stack">
-            <span v-for="(tech, idx) in (project.stack || [])" :key="idx" class="stack-chip">{{ tech }}</span>
-          </div>
-          <div class="project-links">
-            <a v-if="project.githubLink" :href="project.githubLink" target="_blank" class="github-btn">
-              <span class="material-icons">code</span> GitHub
-            </a>
-          </div>
+          <template v-if="isDashboard && editingProject === project.id">
+            <input v-model="editedTitle" class="edit-input" placeholder="Project Title" />
+            <textarea v-model="editedDescription" class="edit-textarea" placeholder="Description"></textarea>
+            <input v-model="editedStack" class="edit-input" placeholder="Technologies (comma separated)" />
+            <input v-model="editedGithubLink" class="edit-input" placeholder="GitHub Link" />
+            <div class="edit-actions">
+              <button @click="updateProject(project.id)" class="save-btn">Save</button>
+              <button @click="cancelEditing" class="cancel-btn">Cancel</button>
+            </div>
+          </template>
+          <template v-else>
+            <p class="project-description">{{ project.description || 'No description available' }}</p>
+            <div class="project-stack">
+              <span v-for="(tech, idx) in (project.stack || [])" :key="idx" class="stack-chip">{{ tech }}</span>
+            </div>
+            <div class="project-links">
+              <a v-if="project.githubLink" :href="project.githubLink" target="_blank" class="github-btn">
+                <span class="material-icons">code</span> GitHub
+              </a>
+            </div>
+          </template>
           <div class="project-dates">
             <span v-if="project.createdAt" class="date-info">
               <span class="material-icons">calendar_today</span>
@@ -159,31 +265,101 @@ button {
 }
 
 .project-header:hover {
-  background-color: #f5f5f5;
+  background-color: var(--secondary-color);
 }
 
 .project-title {
   flex: 1;
   margin: 0;
   font-size: 1.1em;
+  color: var(--text-color);
+}
+
+.project-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.edit-btn, .delete-btn {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.edit-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.delete-btn:hover {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #ff0000;
 }
 
 .expand-icon {
-  color: #666;
+  color: var(--text-color);
   transition: transform 0.2s;
 }
 
 .project-content {
   padding: 0 15px 15px 15px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--secondary-color);
   margin-top: 10px;
 }
 
-.project-card {
-  background: white;
-  border-radius: 8px;
+.project-description {
+  color: var(--text-color);
+  margin: 10px 0;
+}
+
+.edit-input, .edit-textarea {
+  padding: 8px;
+  border: 1px solid var(--secondary-color);
+  border-radius: var(--border-radius);
+  background: var(--background-color);
+  color: white;
+  width: 100%;
   margin-bottom: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.edit-textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.save-btn, .cancel-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.save-btn {
+  background: var(--accent-color);
+  color: white;
+}
+
+.cancel-btn {
+  background: var(--secondary-color);
+  color: var(--text-color);
+}
+
+.project-card {
+  background: var(--primary-color);
+  border-radius: var(--border-radius);
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
   overflow: hidden;
 }
 </style> 

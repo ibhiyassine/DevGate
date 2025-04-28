@@ -1,31 +1,107 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
 import { fetchUserSubcollection } from '../composables/fetchData.js';
+import { db } from '../firebase';
+import { collection, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 const props = defineProps({
   username: {
     type: String,
     required: true
+  },
+  isDashboard: {
+    type: Boolean,
+    default: false
   }
 });
 
 const skills = ref([]);
 const loading = ref(true);
 const error = ref(null);
+let unsubscribe = null;
+const editingSkill = ref(null);
+const editedTitle = ref('');
+const editedLevel = ref(1);
 
-const fetchSkills = async () => {
+const validSkills = computed(() => {
+  return skills.value
+    .filter(skill => skill.title && skill.title.trim() !== '')
+    .map(skill => ({
+      ...skill,
+      level: Number(skill.level) || 1
+    }));
+});
+
+const startEditing = (skill) => {
+  editingSkill.value = skill.id;
+  editedTitle.value = skill.title;
+  editedLevel.value = Number(skill.level) || 1;
+};
+
+const cancelEditing = () => {
+  editingSkill.value = null;
+  editedTitle.value = '';
+  editedLevel.value = 1;
+};
+
+const updateSkill = async (skillId) => {
   try {
-    loading.value = true;
-    skills.value = await fetchUserSubcollection(props.username, 'skills');
+    const skillRef = doc(db, 'users', props.username, 'skills', skillId);
+    await updateDoc(skillRef, {
+      title: editedTitle.value,
+      level: Number(editedLevel.value),
+      modifiedDate: new Date()
+    });
+    editingSkill.value = null;
   } catch (err) {
-    console.error('Error fetching skills:', err);
-    error.value = err.message || 'Failed to load skills';
-  } finally {
-    loading.value = false;
+    console.error('Error updating skill:', err);
+    error.value = 'Failed to update skill';
   }
 };
 
-onMounted(fetchSkills);
+const deleteSkill = async (skillId) => {
+  try {
+    const skillRef = doc(db, 'users', props.username, 'skills', skillId);
+    await deleteDoc(skillRef);
+  } catch (err) {
+    console.error('Error deleting skill:', err);
+    error.value = 'Failed to delete skill';
+  }
+};
+
+const setupSkillsListener = () => {
+  if (unsubscribe) {
+    unsubscribe();
+  }
+
+  const skillsRef = collection(db, 'users', props.username, 'skills');
+  unsubscribe = onSnapshot(skillsRef, (snapshot) => {
+    skills.value = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    loading.value = false;
+  }, (err) => {
+    console.error('Error listening to skills:', err);
+    error.value = err.message || 'Failed to load skills';
+    loading.value = false;
+  });
+};
+
+onMounted(() => {
+  setupSkillsListener();
+});
+
+onUnmounted(() => {
+  if (unsubscribe) {
+    unsubscribe();
+  }
+});
+
+watch(() => props.username, () => {
+  loading.value = true;
+  setupSkillsListener();
+});
 </script>
 
 <template>
@@ -36,35 +112,49 @@ onMounted(fetchSkills);
     
     <div v-else-if="error">
       <p>Error: {{ error }}</p>
-      <button @click="fetchSkills">Try Again</button>
+      <button @click="setupSkillsListener">Try Again</button>
     </div>
     
-    <div v-else-if="skills.length > 0">
-      <div v-for="skill in skills" :key="skill.id" class="skill-card">
-        <div class="skill-icon">
-          <span class="material-icons">{{ skill.icon || 'code' }}</span>
-        </div>
+    <div v-else-if="validSkills.length > 0">
+      <div v-for="skill in validSkills" :key="skill.id" class="skill-card">
         <div class="skill-content">
           <div class="skill-header">
-            <h4>{{ skill.title }}</h4>
-            <span v-if="skill.category || skill.type" class="skill-badge">{{ skill.category || skill.type }}</span>
-          </div>
-          <div v-if="skill.lastUsed || skill.experienceYears" class="skill-meta">
-            <span v-if="skill.lastUsed">Last used: {{ skill.lastUsed }}</span>
-            <span v-if="skill.experienceYears">• {{ skill.experienceYears }} yrs exp</span>
-          </div>
-          <div class="skill-level">
-            <div class="progress-bar">
-              <div 
-                class="progress" 
-                :style="{ width: `${(skill.level || 1) * 33.33}%` }"
-              ></div>
-            </div>
-            <span class="level-text">{{ 
-              skill.level === 1 ? 'Beginner' : 
-              skill.level === 2 ? 'Intermediate' : 
-              skill.level === 3 ? 'Expert' : 'Beginner'
-            }}</span>
+            <template v-if="isDashboard && editingSkill === skill.id">
+              <input v-model="editedTitle" class="edit-input" />
+              <select v-model.number="editedLevel" class="edit-select">
+                <option :value="1">Beginner</option>
+                <option :value="2">Intermediate</option>
+                <option :value="3">Expert</option>
+              </select>
+              <div class="edit-actions">
+                <button @click="updateSkill(skill.id)" class="save-btn">Save</button>
+                <button @click="cancelEditing" class="cancel-btn">Cancel</button>
+              </div>
+            </template>
+            <template v-else>
+              <h4>{{ skill.title }}</h4>
+              <div class="skill-level">
+                <div class="progress-bar">
+                  <div 
+                    class="progress" 
+                    :style="{ width: `${(skill.level / 3) * 100}%` }"
+                  ></div>
+                </div>
+                <span class="level-text">{{ 
+                  skill.level === 1 ? 'Beginner' : 
+                  skill.level === 2 ? 'Intermediate' : 
+                  skill.level === 3 ? 'Expert' : 'Beginner'
+                }}</span>
+              </div>
+              <div v-if="isDashboard" class="skill-actions">
+                <button @click="startEditing(skill)" class="edit-btn">
+                  <span class="material-icons">edit</span>
+                </button>
+                <button @click="deleteSkill(skill.id)" class="delete-btn">
+                  <span class="material-icons">delete</span>
+                </button>
+              </div>
+            </template>
           </div>
         </div>
       </div>
@@ -77,10 +167,6 @@ onMounted(fetchSkills);
 <style scoped>
 .skills-section {
   margin-top: 20px;
-}
-
-ul {
-  padding-left: 20px;
 }
 
 button {
@@ -96,16 +182,10 @@ button {
   align-items: center;
   gap: 10px;
   margin-bottom: 10px;
-}
-
-.skill-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #e3f2fd;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 15px;
+  background: var(--primary-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
 }
 
 .skill-content {
@@ -116,26 +196,14 @@ button {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.skill-badge {
-  background: #e3f2fd;
-  color: #1976d2;
-  border-radius: 8px;
-  padding: 2px 10px;
-  font-size: 0.85em;
-}
-
-.skill-meta {
-  color: #888;
-  font-size: 0.92em;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 
 .skill-level {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 1;
 }
 
 .progress-bar {
@@ -149,10 +217,79 @@ button {
 .progress {
   height: 100%;
   background-color: #4CAF50;
+  transition: width 0.3s ease;
 }
 
 .level-text {
   font-size: 0.9em;
   font-weight: bold;
+  color: var(--text-color);
+  min-width: 100px;
+  text-align: right;
+}
+
+.skill-actions {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.edit-btn, .delete-btn {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.edit-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.delete-btn:hover {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #ff0000;
+}
+
+.edit-input {
+  padding: 8px;
+  border: 1px solid var(--secondary-color);
+  border-radius: var(--border-radius);
+  background: var(--background-color);
+  color: white;
+  flex: 1;
+}
+
+.edit-select {
+  padding: 8px;
+  border: 1px solid var(--secondary-color);
+  border-radius: var(--border-radius);
+  background: var(--background-color);
+  color: white;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.save-btn, .cancel-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.save-btn {
+  background: var(--accent-color);
+  color: white;
+}
+
+.cancel-btn {
+  background: var(--secondary-color);
+  color: var(--text-color);
 }
 </style> 
