@@ -3,21 +3,20 @@ import SearchBar from './SearchBar.vue';
 import UserInfo from './UserInfo.vue';
 import { onMounted, ref } from 'vue';
 import { authStateListener } from '@/composables/authStateListener';
+import { useRouter } from 'vue-router';
 
 let username = ref('aya');
 
 function defineUsername(u){
   username.value = u.displayName;
-  
 }
+
 const see = ref(false);
+const router = useRouter();
 
-// const see = ref(false);
-
-// onMounted(async () => {
-//   await authStateListener(defineUsername);
-//   console.log(`Username set to: ${username.value}`);
-// })
+onMounted(async () => {
+  await authStateListener(defineUsername);
+});
 </script>
 
 <template>
@@ -37,7 +36,7 @@ const see = ref(false);
         <span 
           class="material-icons hvr" 
           style="font-size: 60px; cursor: pointer; color:var(--primary-color)" 
-          @click="see = !see"
+          @click="router.push('/dashboard')"
         >
           account_circle
         </span>
