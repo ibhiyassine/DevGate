@@ -335,6 +335,7 @@ onUnmounted(() => {
 
 .edit-bio-btn:hover {
   color: green;
+
 }
 
 .email {
