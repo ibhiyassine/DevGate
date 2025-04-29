@@ -108,6 +108,7 @@ onMounted(checkFollowStatus)
   transition: all 0.3s ease;
   border: none;
   outline: none;
+  box-shadow: none;
 }
 
 .not-following {

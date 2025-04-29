@@ -10,6 +10,9 @@ import ProfileInfo from '../components/ProfileInfo.vue'
 import NavbarItem from '../components/NavbarItem.vue'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 
+
+
+
 const route = useRoute()
 const userData = ref(null)
 const loading = ref(true)
@@ -57,6 +60,7 @@ const fetchUserData = async () => {
         loading.value = false
     }
 }
+// Initialize composables
 
 onMounted(fetchUserData)
 
@@ -81,7 +85,7 @@ watch(() => currentUser.value, fetchUserData)
     
     <div v-else-if="userData" class="user-info">
       <div class="profile-layout">
-        <ProfileInfo :userData="userData" />
+        <ProfileInfo :userData="userData" :isDashboard="true"/>
         
         <!-- Right Column - Sections -->
         <div class="profile-right">
