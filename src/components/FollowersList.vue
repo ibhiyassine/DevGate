@@ -1,14 +1,22 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { db } from '../firebase';
+import { doc, updateDoc, arrayRemove } from 'firebase/firestore';
+import { authStateListener } from '@/composables/authStateListener';
 
 const props = defineProps({
   followers: {
     type: Array,
     default: () => []
+  },
+  username: {
+    type: String,
+    required: true
   }
 });
 
 const showModal = ref(false);
+const currentUser = ref(null);
 
 const openModal = () => {
   showModal.value = true;
@@ -17,6 +25,37 @@ const openModal = () => {
 const closeModal = () => {
   showModal.value = false;
 };
+
+const removeFollower = async (followerUsername) => {
+  try {
+    const userRef = doc(db, 'users', props.username);
+    const followerRef = doc(db, 'users', followerUsername);
+    
+    // Remove from user's followers
+    await updateDoc(userRef, {
+      followers: arrayRemove(followerRef)
+    });
+    
+    // Remove from follower's followings
+    await updateDoc(followerRef, {
+      followings: arrayRemove(userRef)
+    });
+
+    // Update local state immediately
+    const index = props.followers.findIndex(follower => follower.id === followerUsername);
+    if (index !== -1) {
+      props.followers.splice(index, 1);
+    }
+  } catch (error) {
+    console.error('Error removing follower:', error);
+  }
+};
+
+onMounted(() => {
+  authStateListener((user) => {
+    currentUser.value = user;
+  });
+});
 </script>
 
 <template>
@@ -35,6 +74,13 @@ const closeModal = () => {
             <span class="material-icons">person</span>
             {{ follower.id }}
           </RouterLink>
+          <button 
+            v-if="currentUser?.displayName?.toLowerCase().replace(/\s+/g, '') === props.username"
+            class="delete-btn"
+            @click="removeFollower(follower.id)"
+          >
+            Remove
+          </button>
         </li>
       </ul>
       <p class="text-black-50" v-else>No followers yet.</p>
@@ -102,7 +148,12 @@ const closeModal = () => {
   scrollbar-width: none;
 }
 
-
+.follower-item {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
 .follower-item a {
   display: flex;
@@ -114,6 +165,7 @@ const closeModal = () => {
   border-radius: 8px;
   text-decoration: none;
   transition: all 0.2s ease;
+  flex-grow: 1;
 }
 
 .follower-item a:hover {
@@ -125,5 +177,20 @@ const closeModal = () => {
 .follower-item .material-icons {
   color: #666;
   font-size: 1.2em;
+}
+
+.delete-btn {
+  padding: 6px 12px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: background-color 0.2s;
+}
+
+.delete-btn:hover {
+  background: #c82333;
 }
 </style> 

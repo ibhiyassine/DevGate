@@ -65,6 +65,7 @@ const fetchUserData = async () => {
 onMounted(fetchUserData)
 
 watch(() => currentUser.value, fetchUserData)
+
 </script>
 
 <template>
@@ -105,6 +106,7 @@ watch(() => currentUser.value, fetchUserData)
 </template>
 
 <style scoped>
+
 .profile {
   min-height: 100vh;
   background-color: var(--background-color);
@@ -221,6 +223,4 @@ watch(() => currentUser.value, fetchUserData)
     padding: 20px;
   }
 }
-
-
 </style>

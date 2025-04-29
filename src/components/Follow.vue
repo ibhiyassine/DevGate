@@ -91,16 +91,16 @@ onMounted(checkFollowStatus)
 
 <template>
   <button 
+    v-if="currentUsername !== targetUsername"
     @click="toggleFollow" 
-    :disabled="isLoading || currentUsername === targetUsername"
+    :disabled="isLoading"
     :class="[
       'follow-button',
       isFollowing ? 'following' : 'not-following',
-      isLoading ? 'loading' : '',
-      currentUsername === targetUsername ? 'disabled' : ''
+      isLoading ? 'loading' : ''
     ]"
   >
-    <span v-if="currentUsername != targetUsername">
+    <span>
       {{ isLoading ? 'Loading...' : (isFollowing ? 'Unfollow' : 'Follow') }}
     </span>
   </button>
