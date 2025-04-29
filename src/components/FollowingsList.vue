@@ -1,14 +1,22 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { db } from '../firebase';
+import { doc, updateDoc, arrayRemove } from 'firebase/firestore';
+import { authStateListener } from '@/composables/authStateListener';
 
 const props = defineProps({
   followings: {
     type: Array,
     default: () => []
+  },
+  username: {
+    type: String,
+    required: true
   }
 });
 
 const showModal = ref(false);
+const currentUser = ref(null);
 
 const openModal = () => {
   showModal.value = true;
@@ -17,6 +25,37 @@ const openModal = () => {
 const closeModal = () => {
   showModal.value = false;
 };
+
+const removeFollowing = async (followingUsername) => {
+  try {
+    const userRef = doc(db, 'users', props.username);
+    const followingRef = doc(db, 'users', followingUsername);
+    
+    // Remove from user's followings
+    await updateDoc(userRef, {
+      followings: arrayRemove(followingRef)
+    });
+    
+    // Remove from following's followers
+    await updateDoc(followingRef, {
+      followers: arrayRemove(userRef)
+    });
+
+    // Update local state immediately
+    const index = props.followings.findIndex(following => following.id === followingUsername);
+    if (index !== -1) {
+      props.followings.splice(index, 1);
+    }
+  } catch (error) {
+    console.error('Error removing following:', error);
+  }
+};
+
+onMounted(() => {
+  authStateListener((user) => {
+    currentUser.value = user;
+  });
+});
 </script>
 
 <template>
@@ -30,18 +69,24 @@ const closeModal = () => {
       <h3>Following</h3>
       <button class="close-btn" @click="closeModal">&times;</button>
       <ul v-if="followings?.length" class="followers-list">
-        <li v-for="following in followings" :key="following" class="follower-item my-1 border-bottom p-1">
+        <li v-for="following in followings" :key="following" class="follower-item">
           <RouterLink :to="'/profile/' + following.id" @click="closeModal">
             <span class="material-icons">person</span>
             {{ following.id }}
           </RouterLink>
+          <button 
+            v-if="currentUser?.displayName?.toLowerCase().replace(/\s+/g, '') === props.username"
+            class="delete-btn"
+            @click="removeFollowing(following.id)"
+          >
+            Unfollow
+          </button>
         </li>
       </ul>
       <p v-else>Not following anyone yet.</p>
     </div>
   </div>
 </template>
-
 <style scoped>
 .following-stat {
   display: flex;
@@ -102,6 +147,12 @@ const closeModal = () => {
 }
 
 
+.follower-item {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
 .follower-item a {
   display: flex;
@@ -113,6 +164,7 @@ const closeModal = () => {
   border-radius: 8px;
   text-decoration: none;
   transition: all 0.2s ease;
+  flex-grow: 1;
 }
 
 .follower-item a:hover {
@@ -124,5 +176,22 @@ const closeModal = () => {
 .follower-item .material-icons {
   color: #666;
   font-size: 1.2em;
+}
+
+.delete-btn {
+  padding: 6px 12px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: background-color 0.2s;
+  box-shadow: none;
+}
+
+.delete-btn:hover {
+  background: #c82333;
+  box-shadow: none;
 }
 </style> 
