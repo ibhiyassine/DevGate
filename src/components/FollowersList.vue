@@ -83,7 +83,7 @@ onMounted(() => {
           </button>
         </li>
       </ul>
-      <p v-else>No followers yet.</p>
+      <p class="text-black-50" v-else>No followers yet.</p>
     </div>
   </div>
 </template>
@@ -124,6 +124,7 @@ onMounted(() => {
 }
 
 .close-btn {
+  box-shadow: none;
   position: absolute;
   top: 10px;
   right: 15px;
@@ -143,7 +144,8 @@ onMounted(() => {
   padding: 0;
   margin: 20px 0;
   max-height: 300px;
-  overflow-y: auto;
+  overflow-y: scroll;
+  scrollbar-width: none;
 }
 
 .follower-item {
@@ -158,17 +160,17 @@ onMounted(() => {
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  background: var(--secondary-color);
+  background: var(--primary-color);
+  color: var(--accent-color);
   border-radius: 8px;
   text-decoration: none;
-  color: var(--dark-color);
   transition: all 0.2s ease;
   flex-grow: 1;
 }
 
 .follower-item a:hover {
-  background: var(--primary-color);
-  color: var(--accent-color);
+  background: rgb(105, 105, 215);
+  color: var(--dark-color);
   transform: translateX(5px);
 }
 

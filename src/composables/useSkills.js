@@ -12,6 +12,9 @@ export function useSkills(getUsername) {
   });
 
   const addSkill = async () => {
+    if(!(newSkill.value.title.trim())){
+      return;
+    }
     try {
       const username = getUsername();
       if (!username) {
@@ -20,7 +23,8 @@ export function useSkills(getUsername) {
       }
       const skillsRef = collection(db, 'users', username, 'skills');
       await addDoc(skillsRef, {
-        ...newSkill.value,
+        title: newSkill.value.title,
+        level: Number.parseInt(newSkill.value.level),
         createdAt: serverTimestamp(),
         modifiedDate: serverTimestamp()
       });

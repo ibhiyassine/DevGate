@@ -58,15 +58,10 @@ const cancelEditing = () => {
 
 const updateProject = async (projectId) => {
   try {
-    const projectRef = doc(db, 'users', props.username, 'projects', projectId);
-    await updateDoc(projectRef, {
-      title: editedTitle.value,
-      description: editedDescription.value,
-      stack: editedStack.value.split(',').map(tech => tech.trim()),
-      githubLink: editedGithubLink.value,
-      modifiedDate: new Date()
-    });
-    editingProject.value = null;
+    loading.value = true;
+    projects.value = await fetchUserSubcollection(props.username, 'projects');
+    projects.value=projects.value    
+    .filter(project => project.id !== "init")
   } catch (err) {
     console.error('Error updating project:', err);
     error.value = 'Failed to update project';

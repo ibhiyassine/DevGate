@@ -15,7 +15,7 @@ export async function addUsername(username, mail,FullName) {
         followings:[],
         followers:[],
         programCounter:0,
-        FullName:FullName,
+        fullName:FullName,
 
     };
     try{

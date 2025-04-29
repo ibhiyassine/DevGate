@@ -61,8 +61,10 @@ const updateSkill = async (skillId) => {
 
 const deleteSkill = async (skillId) => {
   try {
-    const skillRef = doc(db, 'users', props.username, 'skills', skillId);
-    await deleteDoc(skillRef);
+    loading.value = true;
+    skills.value = await fetchUserSubcollection(props.username, 'skills');
+    skills.value=skills.value    
+    .filter(skill => skill.id !== "init")
   } catch (err) {
     console.error('Error deleting skill:', err);
     error.value = 'Failed to delete skill';
@@ -118,43 +120,28 @@ watch(() => props.username, () => {
     <div v-else-if="validSkills.length > 0">
       <div v-for="skill in validSkills" :key="skill.id" class="skill-card">
         <div class="skill-content">
+          
           <div class="skill-header">
-            <template v-if="isDashboard && editingSkill === skill.id">
-              <input v-model="editedTitle" class="edit-input" />
-              <select v-model.number="editedLevel" class="edit-select">
-                <option :value="1">Beginner</option>
-                <option :value="2">Intermediate</option>
-                <option :value="3">Expert</option>
-              </select>
-              <div class="edit-actions">
-                <button @click="updateSkill(skill.id)" class="save-btn">Save</button>
-                <button @click="cancelEditing" class="cancel-btn">Cancel</button>
-              </div>
-            </template>
-            <template v-else>
-              <h4>{{ skill.title }}</h4>
-              <div class="skill-level">
-                <div class="progress-bar">
-                  <div 
-                    class="progress" 
-                    :style="{ width: `${(skill.level / 3) * 100}%` }"
-                  ></div>
-                </div>
-                <span class="level-text">{{ 
-                  skill.level === 1 ? 'Beginner' : 
-                  skill.level === 2 ? 'Intermediate' : 
-                  skill.level === 3 ? 'Expert' : 'Beginner'
-                }}</span>
-              </div>
-              <div v-if="isDashboard" class="skill-actions">
-                <button @click="startEditing(skill)" class="edit-btn">
-                  <span class="material-icons">edit</span>
-                </button>
-                <button @click="deleteSkill(skill.id)" class="delete-btn">
-                  <span class="material-icons">delete</span>
-                </button>
-              </div>
-            </template>
+            <h4>{{ skill.title }}</h4>
+            
+            <span v-if="skill.category || skill.type" class="skill-badge">{{ skill.category || skill.type }}</span>
+          </div>
+          <div v-if="skill.lastUsed || skill.experienceYears" class="skill-meta">
+            <span v-if="skill.lastUsed">Last used: {{ skill.lastUsed }}</span>
+            <span v-if="skill.experienceYears">• {{ skill.experienceYears }} yrs exp</span>
+          </div>
+          <div class="skill-level">
+            <div class="progress-bar">
+              <div 
+                class="progress" 
+                :style="{ width: `${(skill.level || 1) * 33.33}%` }"
+              ></div>
+            </div>
+            <span class="level-text">{{ 
+              skill.level === 1 ? 'Beginner' : 
+              skill.level === 2 ? 'Intermediate' : 
+              skill.level === 3 ? 'Expert' : 'Beginner'
+            }}</span>
           </div>
         </div>
       </div>

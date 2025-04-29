@@ -14,6 +14,9 @@ export function useProjects(getUsername) {
   });
 
   const addProject = async () => {
+    if (!newProject.value.title || !newProject.value.description || !newProject.value.stack || !newProject.value.githubLink) {
+      return;
+    }
     try {
       const username = getUsername();
       if (!username) {

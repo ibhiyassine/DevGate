@@ -142,27 +142,27 @@ onUnmounted(() => {
         </div>
         <div class="bio-section">
           <template v-if="isEditingBio">
-            <textarea 
+            <input 
               v-model="editedBio" 
               class="bio-edit" 
               placeholder="Enter your bio"
               rows="3"
-            ></textarea>
+            >
             <div class="bio-actions">
               <button @click="updateBio" class="save-btn">Save</button>
               <button @click="cancelEditingBio" class="cancel-btn">Cancel</button>
             </div>
           </template>
           <template v-else>
-            <p v-if="currentBio" class="bio">"{{ currentBio }}"</p>
+            <p v-if="currentBio" class="bio">{{ currentBio }}</p>
             <p class="bio" v-else>No bio is available</p>
-            <button v-if="isDashboard" @click="startEditingBio" class="edit-bio-btn">
-              <span class="material-icons">edit</span>
-            </button>
+            <div v-if="isDashboard" @click="startEditingBio" class="edit-bio-btn">
+              <span class="material-icons ">edit</span>
+            </div>
           </template>
         </div>
-        <p class="email">
-          <a :href="`mailto:${userData.email}`">Contact the person!</a>
+        <p class="email" v-if="!isDashboard">
+          <a  :href="`mailto:${userData.email}`">Contact the person!</a>
         </p>
         <div class="profile-stats">
           <FollowersList 
@@ -192,13 +192,15 @@ onUnmounted(() => {
               <template v-else>
                 <span class="hours">{{ currentHours }}</span>
                 <span class="label">hours</span>
-                <button 
-                  v-if="isDashboard" 
-                  @click="startEditingHours" 
-                  class="edit-hours-btn"
-                >
-                  <span class="material-icons">edit</span>
-                </button>
+                <!--
+                  <button 
+                    v-if="isDashboard" 
+                    @click="startEditingHours" 
+                    class="edit-hours-btn"
+                  >
+                    <span class="material-icons">edit</span>
+                  </button>
+                -->
               </template>
             </div>
           </span>
@@ -282,11 +284,12 @@ onUnmounted(() => {
   border: 1px solid var(--secondary-color);
   border-radius: var(--border-radius);
   background: var(--background-color);
-  color: white;
+  color: ver(--text-color);
   font-size: 1.1em;
   line-height: 1.6;
   resize: vertical;
   min-height: 100px;
+  background-color: #ececec;
 }
 
 .bio-actions {
@@ -302,6 +305,7 @@ onUnmounted(() => {
   border-radius: var(--border-radius);
   cursor: pointer;
   font-weight: 500;
+  box-shadow: none !important;
 }
 
 .save-btn {
@@ -322,13 +326,16 @@ onUnmounted(() => {
   border: none;
   color: var(--text-color);
   cursor: pointer;
-  padding: 5px;
+  
   border-radius: 4px;
-  transition: background-color 0.2s;
+  color: rgb(125, 120, 120);
+  box-shadow: none !important;
 }
 
+
 .edit-bio-btn:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  color: green;
+
 }
 
 .email {
@@ -456,4 +463,4 @@ onUnmounted(() => {
     font-size: 1.5em;
   }
 }
-</style> 
+</style>

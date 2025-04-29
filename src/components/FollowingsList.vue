@@ -69,7 +69,7 @@ onMounted(() => {
       <h3>Following</h3>
       <button class="close-btn" @click="closeModal">&times;</button>
       <ul v-if="followings?.length" class="followers-list">
-        <li v-for="following in followings" :key="following" class="follower-item">
+        <li v-for="following in followings" :key="following" class="follower-item my-1 border-bottom p-1">
           <RouterLink :to="'/profile/' + following.id" @click="closeModal">
             <span class="material-icons">person</span>
             {{ following.id }}
@@ -123,6 +123,7 @@ onMounted(() => {
 }
 
 .close-btn {
+  box-shadow: none;
   position: absolute;
   top: 10px;
   right: 15px;
@@ -142,8 +143,10 @@ onMounted(() => {
   padding: 0;
   margin: 20px 0;
   max-height: 300px;
-  overflow-y: auto;
+  overflow-y: scroll;
+  scrollbar-width: none;
 }
+
 
 .follower-item {
   margin-bottom: 10px;
@@ -157,17 +160,17 @@ onMounted(() => {
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  background: var(--secondary-color);
+  background: var(--primary-color);
+  color: var(--accent-color);
   border-radius: 8px;
   text-decoration: none;
-  color: var(--dark-color);
   transition: all 0.2s ease;
   flex-grow: 1;
 }
 
 .follower-item a:hover {
-  background: var(--primary-color);
-  color: var(--accent-color);
+  background: rgb(105, 105, 215);
+  color: var(--dark-color);
   transform: translateX(5px);
 }
 

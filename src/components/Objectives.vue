@@ -56,8 +56,10 @@ const updateObjective = async (objectiveId) => {
 
 const deleteObjective = async (objectiveId) => {
   try {
-    const objectiveRef = doc(db, 'users', props.username, 'objectifs', objectiveId);
-    await deleteDoc(objectiveRef);
+    loading.value = true;
+    objectives.value = await fetchUserSubcollection(props.username, 'objectifs');
+    objectives.value=objectives.value    
+    .filter(objective => objective.id !== "init")
   } catch (err) {
     console.error('Error deleting objective:', err);
     error.value = 'Failed to delete objective';
