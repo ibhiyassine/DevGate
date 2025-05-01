@@ -157,6 +157,8 @@ watch(() => props.username, () => {
           </span>
         </div>
       </div>
+      <RouterLink :to="`/objectiveVisualization/${username}`">Visualisation</RouterLink>
+
     </div>
     
     <p v-else>No objectives listed</p>

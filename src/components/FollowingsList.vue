@@ -69,7 +69,7 @@ onMounted(() => {
       <h3>Following</h3>
       <button class="close-btn" @click="closeModal">&times;</button>
       <ul v-if="followings?.length" class="followers-list">
-        <li v-for="following in followings" :key="following" class="follower-item my-1 border-bottom p-1">
+        <li v-for="following in followings" :key="following" class="follower-item">
           <RouterLink :to="'/profile/' + following.id" @click="closeModal">
             <span class="material-icons">person</span>
             {{ following.id }}
@@ -87,7 +87,6 @@ onMounted(() => {
     </div>
   </div>
 </template>
-
 <style scoped>
 .following-stat {
   display: flex;
@@ -188,9 +187,11 @@ onMounted(() => {
   cursor: pointer;
   margin-left: 10px;
   transition: background-color 0.2s;
+  box-shadow: none;
 }
 
 .delete-btn:hover {
   background: #c82333;
+  box-shadow: none;
 }
 </style> 

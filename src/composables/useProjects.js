@@ -23,13 +23,18 @@ export function useProjects(getUsername) {
         console.error('Username is not available');
         return;
       }
+      
+      // Normalize and filter stack for unique values
+      const uniqueStack = Array.from(new Set(newProject.value.stack.split(',').map(tech => tech.trim().toLowerCase())));
+      
       const projectsRef = collection(db, 'users', username, 'projects');
       await addDoc(projectsRef, {
         ...newProject.value,
-        stack: newProject.value.stack.split(',').map(tech => tech.trim()),
+        stack: uniqueStack,
         createdAt: serverTimestamp(),
         modifiedDate: serverTimestamp()
       });
+      
       newProject.value = {
         title: '',
         description: '',
@@ -38,11 +43,13 @@ export function useProjects(getUsername) {
         createdAt: null,
         modifiedDate: null
       };
+      
       showProjectForm.value = false;
     } catch (err) {
       console.error('Error adding project:', err);
     }
   };
+  
 
   return {
     showProjectForm,

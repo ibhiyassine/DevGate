@@ -9,7 +9,7 @@ import ObjectivesDashboard from '../components/ObjectivesDashboard.vue'
 import ProfileInfo from '../components/ProfileInfo.vue'
 import NavbarItem from '../components/NavbarItem.vue'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-
+import VisualizationItem from '../components/VisualizationItem.vue'
 
 
 
@@ -22,18 +22,20 @@ const error = ref(null)
 const auth = getAuth()
 const currentUser = ref(null)
 
-onMounted(() => {
+onMounted(async () => {
+  await new Promise((resolve) => {
     onAuthStateChanged(auth, (user) => {
-        if (user) {
-            currentUser.value = user
-            
-        } else {
-            currentUser.value = null
-            
-        }
+      if (user) {
+        currentUser.value = user.displayName
+      } else {
+        currentUser.value = null
+      }
+      resolve()
     })
-})
+  })
 
+  await fetchUserData() 
+})
 const fetchUserData = async () => {
     
     try {
@@ -44,7 +46,7 @@ const fetchUserData = async () => {
             userData.value = null
             return
         }
-        const userDoc = await getDoc(doc(db, 'users', currentUser.value.displayName))
+        const userDoc = await getDoc(doc(db, 'users', currentUser.value))
         
         if (!userDoc.exists()) {
             error.value = 'User not found'
@@ -60,9 +62,6 @@ const fetchUserData = async () => {
         loading.value = false
     }
 }
-// Initialize composables
-
-onMounted(fetchUserData)
 
 watch(() => currentUser.value, fetchUserData)
 
@@ -91,18 +90,21 @@ watch(() => currentUser.value, fetchUserData)
         <!-- Right Column - Sections -->
         <div class="profile-right">
           <div class="section-card">
-            <SkillsDashboard :username="currentUser?.displayName" />
+            <SkillsDashboard :username="currentUser" />
           </div>
           <div class="section-card">
-            <ProjectsDashboard :username="currentUser?.displayName" />
+            <ProjectsDashboard :username="currentUser" />
           </div>
           <div class="section-card">
-            <ObjectivesDashboard :username="currentUser?.displayName" />
+            <ObjectivesDashboard :username="currentUser" />
           </div>
         </div>
       </div>
+     
+
     </div>
   </div>
+  
 </template>
 
 <style scoped>
@@ -223,4 +225,5 @@ watch(() => currentUser.value, fetchUserData)
     padding: 20px;
   }
 }
+
 </style>
