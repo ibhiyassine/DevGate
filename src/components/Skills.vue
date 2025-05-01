@@ -63,8 +63,8 @@ const deleteSkill = async (skillId) => {
   try {
     loading.value = true;
     skills.value = await fetchUserSubcollection(props.username, 'skills');
-    skills.value=skills.value    
-    .filter(skill => skill.id !== "init")
+    skills.value = skills.value
+      .filter(skill => skill.id !== "init")
   } catch (err) {
     console.error('Error deleting skill:', err);
     error.value = 'Failed to delete skill';
@@ -109,21 +109,24 @@ watch(() => props.username, () => {
 <template>
   <div class="skills-section">
     <h3>Skills</h3>
-    
+
     <div v-if="loading">Loading skills...</div>
-    
+
     <div v-else-if="error">
       <p>Error: {{ error }}</p>
       <button @click="setupSkillsListener">Try Again</button>
     </div>
-    
+
     <div v-else-if="validSkills.length > 0">
       <div v-for="skill in validSkills" :key="skill.id" class="skill-card">
+        <div class="skill-icon">
+            <span class="material-icons">code</span>
+          </div>
         <div class="skill-content">
-          
           <div class="skill-header">
+
             <h4>{{ skill.title }}</h4>
-            
+
             <span v-if="skill.category || skill.type" class="skill-badge">{{ skill.category || skill.type }}</span>
           </div>
           <div v-if="skill.lastUsed || skill.experienceYears" class="skill-meta">
@@ -132,23 +135,20 @@ watch(() => props.username, () => {
           </div>
           <div class="skill-level">
             <div class="progress-bar">
-              <div 
-                class="progress" 
-                :style="{ width: `${(skill.level || 1) * 33.33}%` }"
-              ></div>
+              <div class="progress" :style="{ width: `${(skill.level || 1) * 33.33}%` }"></div>
             </div>
-            <span class="level-text">{{ 
-              skill.level === 1 ? 'Beginner' : 
-              skill.level === 2 ? 'Intermediate' : 
-              skill.level === 3 ? 'Expert' : 'Beginner'
+            <span class="level-text">{{
+              skill.level === 1 ? 'Beginner' :
+                skill.level === 2 ? 'Intermediate' :
+                  skill.level === 3 ? 'Expert' : 'Beginner'
             }}</span>
           </div>
         </div>
       </div>
-      <RouterLink :to="`/skillVisualization/${username}`" >Visualisation</RouterLink>
+      <RouterLink :to="`/skillVisualization/${username}`">Visualisation</RouterLink>
 
     </div>
-    
+
     <p v-else>No skills listed</p>
   </div>
 </template>
@@ -156,6 +156,16 @@ watch(() => props.username, () => {
 <style scoped>
 .skills-section {
   margin-top: 20px;
+}
+
+.skill-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e3f2fd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 button {
@@ -172,9 +182,7 @@ button {
   gap: 10px;
   margin-bottom: 10px;
   padding: 15px;
-  background: var(--primary-color);
   border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
 }
 
 .skill-content {
@@ -223,7 +231,8 @@ button {
   margin-left: auto;
 }
 
-.edit-btn, .delete-btn {
+.edit-btn,
+.delete-btn {
   background: none;
   border: none;
   color: var(--text-color);
@@ -264,7 +273,8 @@ button {
   gap: 10px;
 }
 
-.save-btn, .cancel-btn {
+.save-btn,
+.cancel-btn {
   padding: 8px 16px;
   border: none;
   border-radius: var(--border-radius);
@@ -281,4 +291,4 @@ button {
   background: var(--secondary-color);
   color: var(--text-color);
 }
-</style> 
+</style>

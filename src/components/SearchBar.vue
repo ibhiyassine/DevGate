@@ -54,7 +54,7 @@ const handleBlur = () => {
         style="color: black;">search</span>
       <input class="form-control ps-5 rounded border-0" type="text" placeholder="Search for people" style="height: 50px;"
         v-model="search" ref="inputref" @focus="cliick = true" @blur="handleBlur"
-        @input="cliick = search_field.trim().length > 0" />
+        @input="cliick = search.trim().length > 0" />
     </div>
 
     <div v-show="search.trim().length > 0 && cliick" :ref="suggestionsRef"

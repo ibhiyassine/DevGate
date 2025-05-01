@@ -259,11 +259,10 @@ button {
   padding: 15px;
   cursor: pointer;
   transition: background-color 0.2s;
+  box-shadow: none !important;
+  background-color: var(--primary-color);
 }
 
-.project-header:hover {
-  background-color: var(--secondary-color);
-}
 
 .project-title {
   flex: 1;
@@ -353,10 +352,8 @@ button {
 }
 
 .project-card {
-  background: var(--primary-color);
   border-radius: var(--border-radius);
   margin-bottom: 10px;
-  box-shadow: var(--shadow);
   overflow: hidden;
 }
 </style> 
