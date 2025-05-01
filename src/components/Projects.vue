@@ -183,6 +183,8 @@ watch(() => props.username, () => {
           </div>
         </div>
       </div>
+      <RouterLink :to="`/projectVisualization/${username}`">Visualization</RouterLink>
+
     </div>
     
     <p v-else>No projects listed</p>

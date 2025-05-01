@@ -4,6 +4,7 @@ import { fetchUserSubcollection } from '../composables/fetchData.js'
 import { useProjects } from '@/composables/useProjects'
 import { db } from '@/firebase'
 import { Timestamp, collection, onSnapshot, doc, updateDoc, deleteDoc,  } from 'firebase/firestore' 
+import VisualizationItemProject from './VisualizationItemProject.vue'
 
 const props = defineProps({
   username: {
@@ -168,6 +169,7 @@ watch(() => props.username, () => {
               <button @click="cancelEditing" class="cancel-btn">Cancel</button>
             </div>
           </div>
+          
         </template>
         <template v-else>
             <div class="project-header" @click="toggleProject(project.id)">
@@ -179,6 +181,7 @@ watch(() => props.username, () => {
               {{ expandedProjects.has(project.id) ? 'expand_less' : 'expand_more' }}
             </span>
           </div>
+          
           </template>
 
         <div v-if="expandedProjects.has(project.id) && editingProject != project.id" class="project-content">
@@ -221,7 +224,10 @@ watch(() => props.username, () => {
             </div>
           </div>
         </div>
+  
       </div>
+      <RouterLink :to="`/projectVisualization/${username}`">Visualization</RouterLink>
+      
     </div>
 
     <p v-else>No projects listed</p>

@@ -6,6 +6,9 @@ import LoginForm from '@/components/LoginForm.vue'
 import Profile from '@/components/Profile.vue'
 import DashboardView from '../views/DashboardView.vue'
 import { authStateListener } from '@/composables/authStateListener'
+import VisualizationItem from '@/components/VisualizationItem.vue'
+import VisualizationItemProject from '@/components/VisualizationItemProject.vue'
+import VisualizationItemObjectives from '@/components/VisualizationItemObjectives.vue'
 
 
 
@@ -38,6 +41,21 @@ const router = createRouter({
       path: '/dashboard',
       name:'dashboard',
       component:DashboardView
+    },
+    {
+      path: '/skillVisualization/:username',
+      name:'skillVisualization',
+      component:VisualizationItem
+    },
+    {
+      path: '/projectVisualization/:username',
+      name:'projectVisualization',
+      component:VisualizationItemProject
+    },
+    {
+      path: '/objectiveVisualization/:username',
+      name:'objectiveVisualization',
+      component:VisualizationItemObjectives
     }
   ],
 })
