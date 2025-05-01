@@ -29,8 +29,12 @@ let filtered = computed(() => {
 
 onMounted(async () => {
   loading.value = true;
-  followings.value = await getFollowings();
-  activites.value = await getActivities();
+  const [follows, acts] = await Promise.all([
+    getFollowings(),
+    getActivities()
+  ]);
+  followings.value = follows;
+  activites.value = acts;
   loading.value = false;
 });
 

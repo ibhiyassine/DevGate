@@ -6,6 +6,10 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { db } from '../firebase'
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore'
 import { authStateListener } from '@/composables/authStateListener'
+import { getPfp, cld } from '../../cloudinary'
+import { AdvancedImage } from '@cloudinary/vue';
+import UploadPfp from './UploadPfp.vue'
+import { CloudinaryImage } from '@cloudinary/url-gen';
 
 const props = defineProps({
   userData: {
@@ -25,7 +29,11 @@ const editedHours = ref(0)
 const currentBio = ref('')
 const currentHours = ref(0)
 let unsubscribe = null
-const currentUser = ref(null)
+const currentUser = ref(null);
+
+const userPfp = ref(null);
+const openWidget = ref(false);
+const imageLoaded = ref(false);
 
 const startEditingBio = () => {
   editedBio.value = currentBio.value
@@ -74,18 +82,39 @@ const updateHours = async () => {
   }
 }
 
-const setupUserListener = () => {
-  if (unsubscribe) {
-    unsubscribe()
-  }
-
-  const userRef = doc(db, 'users', props.userData.username)
-  unsubscribe = onSnapshot(userRef, (doc) => {
-    if (doc.exists()) {
-      currentBio.value = doc.data().bio || ''
-      currentHours.value = doc.data().programCounter || 0
+const setupUserListener = async () => {
+  try {
+    // Create a direct CloudinaryImage for the user
+    const publicId = 'users/' + props.userData.username;
+    // Check if the image exists first
+    const response = await fetch(`https://res.cloudinary.com/devgate/image/upload/${publicId}.png`);
+    
+    if (response.ok) {
+      // Image exists, create a CloudinaryImage instance
+      const myImg = cld.image(publicId);
+      myImg.format('png');
+      
+      // Set the image
+      userPfp.value = myImg;
+      imageLoaded.value = true;
+      console.log("User profile picture loaded successfully:", userPfp.value);
+    } else {
+      console.warn('No profile picture found for user:', props.userData.username);
+      imageLoaded.value = false;
     }
-  })
+    
+    // Continue with user data listener
+    const userRef = doc(db, 'users', props.userData.username)
+    unsubscribe = onSnapshot(userRef, (doc) => {
+      if (doc.exists()) {
+        currentBio.value = doc.data().bio || ''
+        currentHours.value = doc.data().programCounter || 0
+      }
+    })
+  } catch (error) {
+    console.error('Error loading profile picture:', error);
+    imageLoaded.value = false;
+  }
 }
 
 const handleFollow = (username) => {
@@ -108,7 +137,7 @@ const handleUnfollow = (username) => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   setupUserListener()
   authStateListener((user) => {
     currentUser.value = user
@@ -126,7 +155,19 @@ onUnmounted(() => {
   <div class="profile-left">
     <div class="profile-header">
       <div class="profile-avatar">
-        {{ userData.username ? userData.username[0].toUpperCase() : '?' }}
+        <div @click="openWidget = true">
+          <template v-if="imageLoaded && userPfp">
+            <AdvancedImage :cldImg="userPfp" style="width: 120px; height: 120px;" class="border border-2 border-info rounded-circle avatar" />
+          </template>
+          <template v-else>
+            <div class="avatar">
+              {{ userData.username ? userData.username[0].toUpperCase() : '?' }}
+            </div>
+          </template>
+          <div v-if="openWidget && isDashboard" class="widget">
+            <UploadPfp />
+          </div>
+        </div>
       </div>
       <div class="profile-details">
         <h1>{{ userData.fullname }}</h1>
@@ -226,6 +267,12 @@ onUnmounted(() => {
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
 }
+
+.avatar:hover{
+  cursor: pointer;
+  opacity: 0.6;
+}
+
 
 .profile-avatar {
   width: 120px;

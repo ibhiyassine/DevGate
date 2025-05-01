@@ -1,61 +1,60 @@
-import { fetchUser, fetchUserSubcollection } from './fetchData';
-import { getFirestore,collection,getDocs } from 'firebase/firestore';
-
-async function getusers() {
-    const users = [];
-    const db = getFirestore();
-    const usersCollection = collection(db, 'users');
-
-    const snapshot = await getDocs(usersCollection);
-    snapshot.forEach(doc => {
-        users.push({ username: doc.id, ...doc.data() });
-    });
-    return users;
-}
+import { fetchUser, fetchUserSubcollection } from './fetchData'
+import { getFirestore, collection, getDocs, query, orderBy, limit } from 'firebase/firestore'
 
 export async function getActivities() {
-    const Data=[];
-    const users = await getusers();
-    for(const user of users){
-        const userData=await fetchUser(user.username);
-        //skills
-        const skills=await fetchUserSubcollection(user.username,'skills');
-        skills
-            .filter(skill => skill.id !== "init")
-            .forEach(skill => {
-            Data.push({
-                type:'skill',
-                modifiedDate: skill.modifiedDate,
-                user: userData,
-                skill: skill
-            });
-            });
-        //projects
-        const projects=await fetchUserSubcollection(user.username,'projects');
-        projects
-            .filter(project => project.id !== "init")
-            .forEach(project => {
-            Data.push({
-                type:'project',
-                modifiedDate: project.modifiedDate,
-                user: userData,
-                project: project
-            });
-            });
+  const db = getFirestore()
+  const usersCollection = collection(db, 'users')
 
-        //objectifs
-        const objectifs=await fetchUserSubcollection(user.username,'objectifs');
-        objectifs
-            .filter(objectif => objectif.id !== "init")
-            .forEach(objectif => {
-            Data.push({
-                type:'objectif',
-                modifiedDate: objectif.modifiedDate,
-                user: userData,
-                objectif: objectif
-            });
-            });
-    }
-    Data.sort((a, b) => a.modifiedDate - b.modifiedDate);
-    return Data;
+  const snapshot = await getDocs(usersCollection)
+  const users = snapshot.docs.map((doc) => ({
+    username: doc.id,
+    ...doc.data(),
+  }))
+
+  const activitiesData = []
+
+  const userPromises = users.map(async (user) => {
+    const skills = await fetchUserSubcollection(user.username, 'skills')
+    const projects = await fetchUserSubcollection(user.username, 'projects')
+    const objectifs = await fetchUserSubcollection(user.username, 'objectifs')
+
+    skills
+      .filter((skill) => skill.id !== 'init')
+      .forEach((skill) => {
+        activitiesData.push({
+          type: 'skill',
+          modifiedDate: skill.modifiedDate,
+          user: user,
+          skill: skill,
+        })
+      })
+
+    projects
+      .filter((project) => project.id !== 'init')
+      .forEach((project) => {
+        activitiesData.push({
+          type: 'project',
+          modifiedDate: project.modifiedDate,
+          user: user,
+          project: project,
+        })
+      })
+
+    objectifs
+      .filter((objectif) => objectif.id !== 'init')
+      .forEach((objectif) => {
+        activitiesData.push({
+          type: 'objectif',
+          modifiedDate: objectif.modifiedDate,
+          user: user,
+          objectif: objectif,
+        })
+      })
+  })
+
+  await Promise.all(userPromises)
+
+  activitiesData.sort((a, b) => b.modifiedDate - a.modifiedDate)
+
+  return activitiesData
 }
