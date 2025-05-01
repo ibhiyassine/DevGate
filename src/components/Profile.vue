@@ -65,7 +65,7 @@ watch(() => route.params.username, fetchUserData)
           <div class="section-card">
             <Skills :username="route.params.username" />
           </div>
-          <div class="section-card">
+          <div class="section-card" style="background-color: #ececec;">
             <Projects :username="route.params.username" />
           </div>
           <div class="section-card">

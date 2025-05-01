@@ -173,9 +173,7 @@ watch(() => props.username, () => {
 .objective-item {
   padding: 15px;
   margin-bottom: 10px;
-  background: var(--primary-color);
   border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
 }
 
 .objective-header {

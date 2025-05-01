@@ -4,6 +4,7 @@ import UserInfo from './UserInfo.vue';
 import { onMounted, ref } from 'vue';
 import { authStateListener } from '@/composables/authStateListener';
 import { useRouter } from 'vue-router';
+import { logout } from '@/composables/userLogout';
 
 let username = ref('aya');
 
@@ -17,6 +18,11 @@ const router = useRouter();
 onMounted(async () => {
   await authStateListener(defineUsername);
 });
+
+function logoutUser(){
+  logout();
+  router.go();
+}
 </script>
 
 <template>
@@ -34,13 +40,21 @@ onMounted(async () => {
       
       <div class="d-flex align-items-center me-4 position-relative">
         <span 
-          class="material-icons hvr" 
-          style="font-size: 60px; cursor: pointer; color:var(--primary-color)" 
-          @click="router.push('/dashboard')"
+        class="material-icons hvr" 
+        style="font-size: 60px; cursor: pointer; color:var(--primary-color)" 
+        @click="router.push('/dashboard')"
         >
-          account_circle
-        </span>
-
+        account_circle
+      </span>
+      <button class="bg-danger shadow-none rounded-circle logout d-flex align-items-center justify-content-center">
+          <span 
+          class="material-icons" 
+          style="cursor: pointer; font-size: 30px; transform: translateX(2px);" 
+          @click="logoutUser()"
+          >
+          logout
+          </span>
+      </button>
         
         <div 
           v-if="see" 
@@ -87,5 +101,10 @@ onMounted(async () => {
   height: 300px;
   z-index: 1001;
   width: 300px;
+}
+
+.logout{
+  height: 50px;
+  width: 50px;
 }
 </style>
