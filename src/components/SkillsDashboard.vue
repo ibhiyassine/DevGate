@@ -94,7 +94,9 @@ watch(() => props.username, () => {
 });
 
 
-onMounted(() => {setupSkillsListener();})
+onMounted(() => {setupSkillsListener();
+  console.log("data",skills.value)
+})
 
 onUnmounted(() => {
   if (unsubscribe) {
@@ -143,8 +145,8 @@ onUnmounted(() => {
           @mouseleave="skill.isEditing = false"
           @click="startEditing(skill)"
         >
-          <span class="material-icons">{{ skill.isEditing ? 'edit' : skill.icon || 'code' }}</span>
-        </div>
+        <span class="material-icons">{{ skill.isEditing ? 'edit' : (typeof skill.icon === 'string' ? skill.icon : 'code') }}</span>
+      </div>
         <div class="skill-content">
 
             <template v-if="editingSkill === skill.id">
@@ -190,6 +192,7 @@ onUnmounted(() => {
             </template>
         </div>
       </div>
+      <RouterLink :to="`/skillVisualization/${username}`" >Visualisation</RouterLink>
     </div>
 
     <p v-else>No skills listed</p>

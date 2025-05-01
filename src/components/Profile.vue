@@ -41,7 +41,7 @@ watch(() => route.params.username, fetchUserData)
 </script>
 
 <template>
-  <NavbarItem />
+<NavbarItem />
   <div class="profile ">
     <div v-if="loading" class="loading">
       <div class="loading-spinner"></div>

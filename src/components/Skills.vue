@@ -145,6 +145,8 @@ watch(() => props.username, () => {
           </div>
         </div>
       </div>
+      <RouterLink :to="`/skillVisualization/${username}`" >Visualisation</RouterLink>
+
     </div>
     
     <p v-else>No skills listed</p>

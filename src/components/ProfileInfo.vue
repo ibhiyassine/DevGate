@@ -118,26 +118,35 @@ const setupUserListener = async () => {
 }
 
 const handleFollow = (username) => {
-  if (!props.userData.followers) {
-    props.userData.followers = []
-  }
-  props.userData.followers.push({ id: username })
-  if (props.userData.followersCount === undefined) {
-    props.userData.followersCount = 0
-  }
-  props.userData.followersCount++
-}
-
-const handleUnfollow = (username) => {
-  if (props.userData.followers) {
-    props.userData.followers = props.userData.followers.filter(follower => follower.id !== username)
-    if (props.userData.followersCount > 0) {
-      props.userData.followersCount--
+  const followers = Array.isArray(props.userData.followers) ? [...props.userData.followers] : [];
+  
+  const existingFollower = followers.find(follower => follower.id === username);
+  
+  if (!existingFollower) {
+    followers.push({ id: username });
+    
+    props.userData.followers = followers;
+    
+    if (props.userData.followersCount === undefined) {
+      props.userData.followersCount = 1;
+    } else {
+      props.userData.followersCount++;
     }
   }
 }
 
-onMounted(async () => {
+const handleUnfollow = (username) => {
+  if (Array.isArray(props.userData.followers)) {
+    const followers = props.userData.followers.filter(follower => follower.id !== username);
+    
+    props.userData.followers = followers;
+    
+    if (props.userData.followersCount > 0) {
+      props.userData.followersCount--;
+    }
+  }
+}
+onMounted(() => {
   setupUserListener()
   authStateListener((user) => {
     currentUser.value = user
@@ -177,8 +186,8 @@ onUnmounted(() => {
             v-if="!isDashboard && currentUser" 
             :targetUsername="userData.username" 
             :currentUsername="currentUser.displayName.toLowerCase().replace(/\s+/g, '')"
-            @follow="handleFollow"
-            @unfollow="handleUnfollow"
+            @follow="handleFollow(currentUser.displayName.toLowerCase().replace(/\s+/g, ''))"
+            @unfollow="handleUnfollow(currentUser.displayName.toLowerCase().replace(/\s+/g, ''))"
           />
         </div>
         <div class="bio-section">

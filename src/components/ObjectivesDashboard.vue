@@ -162,6 +162,7 @@ watch(() => props.username, () => {
           <span class="material-icons style" @click.stop="deleteObjective(objective.id)"> delete </span>
         </div>
       </div>
+      <RouterLink :to="`/objectiveVisualization/${username}`">Visualisation</RouterLink>
     </div>
 
     <p v-else>No objectives listed</p>
