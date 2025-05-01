@@ -2,6 +2,7 @@
 import FollowersList from './FollowersList.vue'
 import FollowingsList from './FollowingsList.vue'
 import Follow from './Follow.vue'
+import LevelProgress from './LevelProgress.vue'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { db } from '../firebase'
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore'
@@ -207,13 +208,10 @@ onUnmounted(() => {
             <p v-if="currentBio" class="bio">{{ currentBio }}</p>
             <p class="bio" v-else>No bio is available</p>
             <div v-if="isDashboard" @click="startEditingBio" class="edit-bio-btn">
-              <span class="material-icons ">edit</span>
+              <span class="material-icons">edit</span>
             </div>
           </template>
         </div>
-        <p class="email" v-if="!isDashboard">
-          <a  :href="`mailto:${userData.email}`">Contact the person!</a>
-        </p>
         <div class="profile-stats">
           <FollowersList 
             :followers="userData.followers || []" 
@@ -223,43 +221,23 @@ onUnmounted(() => {
             :followings="userData.followings || []" 
             :username="userData.username"
           />
-
-          <span class="stat">
-            <span class="material-icons">code</span>
-            <div class="programming-hours">
-              <template v-if="isEditingHours">
-                <input 
-                  type="number" 
-                  v-model="editedHours" 
-                  class="hours-input"
-                  min="0"
-                />
-                <div class="hours-actions">
-                  <button @click="updateHours" class="save-btn">Save</button>
-                  <button @click="cancelEditingHours" class="cancel-btn">Cancel</button>
-                </div>
-              </template>
-              <template v-else>
-                <span class="hours">{{ currentHours }}</span>
-                <span class="label">hours</span>
-                <!--
-                  <button 
-                    v-if="isDashboard" 
-                    @click="startEditingHours" 
-                    class="edit-hours-btn"
-                  >
-                    <span class="material-icons">edit</span>
-                  </button>
-                -->
-              </template>
-            </div>
-          </span>
           <span class="stat">
             <span class="material-icons">calendar_today</span>
             Member since {{ userData.createdAt?.toDate ? userData.createdAt.toDate().toLocaleDateString() : (userData.createdAt || 'N/A') }}
           </span>
         </div>
+
+        <p class="email" v-if="!isDashboard">
+          <a :href="`mailto:${userData.email}`">Contact the person!</a>
+        </p>
       </div>
+    </div>
+    <div class="level-section">
+      <LevelProgress 
+        :hours="currentHours" 
+        :username="userData.username"
+        :isDashboard="isDashboard"
+      />
     </div>
   </div>
 </template>
@@ -411,10 +389,10 @@ onUnmounted(() => {
 
 .profile-stats {
   display: flex;
-  color: white;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 15px;
-  margin-top: 15px;
+  margin: 20px 0;
 }
 
 .profile-stats .stat {
@@ -425,6 +403,7 @@ onUnmounted(() => {
   border-radius: 8px;
   padding: 8px 12px;
   font-size: 0.95em;
+  color: white;
 }
 
 .programming-hours {
@@ -518,5 +497,10 @@ onUnmounted(() => {
   .profile-details h1 {
     font-size: 1.5em;
   }
+}
+
+.level-section {
+  margin-top: 20px;
+  width: 100%;
 }
 </style>
