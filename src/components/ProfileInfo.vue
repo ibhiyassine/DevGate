@@ -289,6 +289,8 @@ onUnmounted(() => {
 
 .bio {
   color: var(--dark-color);
+  overflow-wrap: break-word;
+  text-overflow: ellipsis;
   font-size: 1.1em;
   line-height: 1.6;
   margin: 0;
