@@ -51,7 +51,7 @@ onMounted(async () => {
       const publicId = 'users/' + props.user.username;
       
       // Check if the image exists first
-      const response = await fetch(`https://res.cloudinary.com/devgate/image/upload/${publicId}.png`);
+      const response = await fetch(`https://res.cloudinary.com/devgate/image/upload/${publicId}`);
       
       if (response.ok) {
         // Image exists, create a CloudinaryImage instance
@@ -61,13 +61,10 @@ onMounted(async () => {
         // Set the image
         userPfp.value = myImg;
         imageLoaded.value = true;
-        console.log("Activity card user profile picture loaded:", props.user.username);
       } else {
-        console.warn('No profile picture found for user:', props.user.username);
         imageLoaded.value = false;
       }
     } catch (error) {
-      console.error('Error loading profile picture:', error);
       imageLoaded.value = false;
     }
   }

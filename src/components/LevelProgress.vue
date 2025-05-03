@@ -47,7 +47,7 @@ const updateHours = async () => {
     })
     isEditingHours.value = false
   } catch (err) {
-    console.error('Error updating programming hours:', err)
+
   }
 }
 </script>
@@ -60,13 +60,7 @@ const updateHours = async () => {
           Current hours: {{ hours }}h
         </div>
         <div class="add-hours">
-          <input 
-            type="number" 
-            v-model="hoursToAdd" 
-            class="hours-input"
-            min="0"
-            placeholder="Hours to add"
-          />
+          <input type="number" v-model="hoursToAdd" class="hours-input" min="0" placeholder="Hours to add" />
           <span class="hours-label">hours to add</span>
         </div>
         <div class="hours-actions">
@@ -78,26 +72,11 @@ const updateHours = async () => {
     <template v-else>
       <div class="progress-circle">
         <svg class="progress-ring" width="200" height="200">
-          <circle
-            class="progress-ring-circle-bg"
-            stroke-width="8"
-            fill="transparent"
-            r="90"
-            cx="100"
-            cy="100"
-          />
-          <circle
-            class="progress-ring-circle"
-            stroke-width="8"
-            fill="transparent"
-            r="90"
-            cx="100"
-            cy="100"
-            :style="{
-              strokeDasharray: `${2 * Math.PI * 90 * progress / 100} ${2 * Math.PI * 90}`,
-              strokeDashoffset: '0'
-            }"
-          />
+          <circle class="progress-ring-circle-bg" stroke-width="8" fill="transparent" r="90" cx="100" cy="100" />
+          <circle class="progress-ring-circle" stroke-width="8" fill="transparent" r="90" cx="100" cy="100" :style="{
+            strokeDasharray: `${2 * Math.PI * 90 * progress / 100} ${2 * Math.PI * 90}`,
+            strokeDashoffset: '0'
+          }" />
         </svg>
         <div class="progress-content">
           <span class="level">Level {{ level }}</span>
@@ -105,12 +84,8 @@ const updateHours = async () => {
           <span class="next-level">Next level in {{ 50 - (hours % 50) }}h</span>
         </div>
       </div>
-      <button 
-        v-if="isDashboard" 
-        @click="startEditingHours" 
-        class="edit-hours-btn"
-      >
-        <span class="material-icons">add</span>
+      <button v-if="isDashboard" @click="startEditingHours" class="edit-hours-btn">
+        <span class="material-icons fs-2 icon-btn">add_circle</span>
       </button>
     </template>
   </div>
@@ -223,7 +198,8 @@ const updateHours = async () => {
   width: 100%;
 }
 
-.save-btn, .cancel-btn {
+.save-btn,
+.cancel-btn {
   flex: 1;
   padding: 8px 16px;
   border: none;
@@ -248,14 +224,19 @@ const updateHours = async () => {
   right: 10px;
   background: none;
   border: none;
-  color: var(--text-color);
+  color: black;
   cursor: pointer;
-  padding: 8px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   transition: background-color 0.2s;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.edit-hours-btn:hover {
-  background-color: var(--secondary-color);
+.icon-btn:hover {
+  color: gray;
 }
-</style> 
+</style>

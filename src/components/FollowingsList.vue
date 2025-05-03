@@ -30,12 +30,12 @@ const removeFollowing = async (followingUsername) => {
   try {
     const userRef = doc(db, 'users', props.username);
     const followingRef = doc(db, 'users', followingUsername);
-    
+
     // Remove from user's followings
     await updateDoc(userRef, {
       followings: arrayRemove(followingRef)
     });
-    
+
     // Remove from following's followers
     await updateDoc(followingRef, {
       followers: arrayRemove(userRef)
@@ -47,7 +47,7 @@ const removeFollowing = async (followingUsername) => {
       props.followings.splice(index, 1);
     }
   } catch (error) {
-    console.error('Error removing following:', error);
+
   }
 };
 
@@ -74,11 +74,8 @@ onMounted(() => {
             <span class="material-icons">person</span>
             {{ following.id }}
           </RouterLink>
-          <button 
-            v-if="currentUser?.displayName?.toLowerCase().replace(/\s+/g, '') === props.username"
-            class="delete-btn"
-            @click="removeFollowing(following.id)"
-          >
+          <button v-if="currentUser?.displayName?.toLowerCase().replace(/\s+/g, '') === props.username"
+            class="delete-btn" @click="removeFollowing(following.id)">
             Unfollow
           </button>
         </li>
@@ -104,7 +101,7 @@ onMounted(() => {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -115,7 +112,7 @@ onMounted(() => {
   background: var(--primary-color);
   padding: 30px 40px;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   min-width: 300px;
   max-width: 90vw;
   position: relative;
@@ -194,4 +191,4 @@ onMounted(() => {
   background: #c82333;
   box-shadow: none;
 }
-</style> 
+</style>

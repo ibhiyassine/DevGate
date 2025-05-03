@@ -18,10 +18,10 @@ const widget = window.cloudinary.createUploadWidget(
     },
     (error, result) => {
         if (error) {
-            console.error("Upload failed:", error);
+
             return;
         }
-        console.log("Upload successful:", result.info);
+
     }
 );
 
@@ -39,6 +39,4 @@ onMounted(() => {
 
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

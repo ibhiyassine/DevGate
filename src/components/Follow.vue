@@ -34,7 +34,7 @@ const checkFollowStatus = async () => {
       )
     }
   } catch (error) {
-    console.error('Error checking follow status:', error)
+
   } finally {
     isLoading.value = false
   }
@@ -75,11 +75,11 @@ const toggleFollow = async () => {
 
     // Commit the batch
     await batch.commit()
-    
+
     // Update local state
     isFollowing.value = !isFollowing.value
   } catch (error) {
-    console.error('Error toggling follow status:', error)
+
   } finally {
     isLoading.value = false
   }
@@ -90,16 +90,11 @@ onMounted(checkFollowStatus)
 </script>
 
 <template>
-  <button 
-    v-if="currentUsername !== targetUsername"
-    @click="toggleFollow" 
-    :disabled="isLoading"
-    :class="[
-      'follow-button',
-      isFollowing ? 'following' : 'not-following',
-      isLoading ? 'loading' : ''
-    ]"
-  >
+  <button v-if="currentUsername !== targetUsername" @click="toggleFollow" :disabled="isLoading" :class="[
+    'follow-button',
+    isFollowing ? 'following' : 'not-following',
+    isLoading ? 'loading' : ''
+  ]">
     <span>
       {{ isLoading ? 'Loading...' : (isFollowing ? 'Unfollow' : 'Follow') }}
     </span>
@@ -155,4 +150,4 @@ onMounted(checkFollowStatus)
   background-color: #e0e0e0;
   color: #666;
 }
-</style> 
+</style>

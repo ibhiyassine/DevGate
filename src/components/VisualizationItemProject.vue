@@ -39,7 +39,7 @@ const projectsAddedThisMonth = computed(() => {
 const recentlyModifiedProjects = computed(() => {
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
-  
+
   return projects.value.filter(project => {
     const modifiedDate = project.modifiedDate?.toDate ? project.modifiedDate.toDate() : new Date(project.modifiedDate);
     return modifiedDate >= thirtyDaysAgo;
@@ -48,7 +48,7 @@ const recentlyModifiedProjects = computed(() => {
 
 const projectsByTech = computed(() => {
   const techCount = {};
-  
+
   projects.value.forEach(project => {
     const stack = Array.isArray(project.stack) ? project.stack : [];
     stack.forEach(tech => {
@@ -63,22 +63,22 @@ const projectsByTech = computed(() => {
       }
     });
   });
-  
+
   return techCount;
 });
 
-const projectsWithGithub = computed(() => 
+const projectsWithGithub = computed(() =>
   projects.value.filter(project => project.githubLink && project.githubLink.trim() !== '').length
 );
 
 // Handle auth + fetch data
 onMounted(async () => {
 
-      await fetchProjects();
-      await nextTick(); // ensure canvas refs are rendered
+  await fetchProjects();
+  await nextTick(); // ensure canvas refs are rendered
   initCharts();
- 
-  
+
+
 });
 
 const fetchProjects = async () => {
@@ -90,7 +90,7 @@ const fetchProjects = async () => {
     projects.value = list.filter(project => project.id !== 'init');
     initCharts();
   } catch (error) {
-    console.error('Error fetching projects:', error);
+
   } finally {
     loading.value = false;
   }
@@ -105,18 +105,18 @@ function initCharts() {
 
 function initTechnologyDistributionChart() {
   if (technologyDistributionChartInstance) technologyDistributionChartInstance.destroy();
-  
+
   // Get top technologies
   const techData = projectsByTech.value;
   const sortedTech = Object.entries(techData)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8);
-  
+
   const labels = sortedTech.map(item => item[0]);
   const data = sortedTech.map(item => item[1]);
-  
+
   const ctx = technologyDistributionChart.value.getContext('2d');
-  
+
   const backgroundColors = [
     'rgba(75, 192, 192, 0.7)', // Teal
     'rgba(54, 162, 235, 0.7)', // Blue
@@ -127,7 +127,7 @@ function initTechnologyDistributionChart() {
     'rgba(201, 203, 207, 0.7)', // Gray
     'rgba(0, 204, 150, 0.7)', // Green
   ];
-  
+
   const borderColors = backgroundColors.map(color => color.replace('0.7', '1'));
 
   technologyDistributionChartInstance = new Chart(ctx, {
@@ -183,28 +183,28 @@ function initMonthlyProjectsChart() {
 
 function initProjectsTimelineChart() {
   if (projectsTimelineChartInstance) projectsTimelineChartInstance.destroy();
-  
+
   // Sort projects by creation date
   const sortedProjects = [...projects.value].sort((a, b) => {
     const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
     const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
     return dateA - dateB;
   });
-  
+
   // Get the most recent 10 projects 
   const recentProjects = sortedProjects.slice(-10);
-  
+
   const labels = recentProjects.map(project => {
     const date = project.createdAt?.toDate ? project.createdAt.toDate() : new Date(project.createdAt);
     return date.toLocaleDateString('en', { month: 'short', day: 'numeric' });
   });
-  
+
   // Cumulative count
   const data = [];
   for (let i = 0; i < recentProjects.length; i++) {
     data.push(i + 1);
   }
-  
+
   const ctx = projectsTimelineChart.value.getContext('2d');
 
   projectsTimelineChartInstance = new Chart(ctx, {
@@ -255,7 +255,7 @@ function getMonthlyProjectsData() {
 
     data.push(count);
   }
-  
+
   return { labels, data };
 }
 </script>
@@ -364,7 +364,8 @@ function getMonthlyProjectsData() {
 .all {
   width: 90%;
   margin: 0 auto;
-  padding-top: 60px; /* Added space for navbar */
+  padding-top: 60px;
+  /* Added space for navbar */
 }
 
 .projects {

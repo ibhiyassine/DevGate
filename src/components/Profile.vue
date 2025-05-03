@@ -19,16 +19,16 @@ const fetchUserData = async () => {
     loading.value = true
     error.value = null
     const userDoc = await getDoc(doc(db, 'users', route.params.username))
-    
+
     if (!userDoc.exists()) {
       error.value = 'User not found'
       userData.value = null
       return
     }
-    
+
     userData.value = userDoc.data()
   } catch (err) {
-    console.error('Error fetching user data:', err)
+
     error.value = 'Error loading user data'
   } finally {
     loading.value = false
@@ -41,13 +41,13 @@ watch(() => route.params.username, fetchUserData)
 </script>
 
 <template>
-<NavbarItem />
+  <NavbarItem />
   <div class="profile ">
     <div v-if="loading" class="loading">
       <div class="loading-spinner"></div>
       <p>Loading profile...</p>
-    </div>    
-    
+    </div>
+
     <div v-else-if="error" class="error">
       <div class="error-container">
         <div class="error-icon">!</div>
@@ -55,11 +55,11 @@ watch(() => route.params.username, fetchUserData)
         <RouterLink to="/" class="back-link">Back to Home</RouterLink>
       </div>
     </div>
-    
+
     <div v-else-if="userData" class="user-info">
       <div class="profile-layout">
         <ProfileInfo :userData="userData" />
-        
+
         <!-- Right Column - Sections -->
         <div class="profile-right">
           <div class="section-card">
@@ -104,8 +104,13 @@ watch(() => route.params.username, fetchUserData)
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error-container {
@@ -194,6 +199,4 @@ watch(() => route.params.username, fetchUserData)
     padding: 20px;
   }
 }
-
-
 </style>

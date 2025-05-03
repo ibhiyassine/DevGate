@@ -11,49 +11,48 @@ let friend = ref(false);
 
 onMounted(async () => {
   const activities = await getActivities()
-  console.log(activities)
+
 })
 </script>
 
 <template>
   <div class="dropdown ">
-    <a
-      class="btn btn-secondary dropdown-toggle filter"
-      href="#"
-      role="button"
-      data-bs-toggle="dropdown"
-      aria-expanded="false"
-    >
+    <a class="btn btn-secondary dropdown-toggle filter" href="#" role="button" data-bs-toggle="dropdown"
+      aria-expanded="false">
       Filter
     </a>
 
     <ul class="dropdown-menu">
       <li>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="" id="check1" v-model="skill" @change="emits('skill', skill)"/>
+          <input class="form-check-input" type="checkbox" value="" id="check1" v-model="skill"
+            @change="emits('skill', skill)" />
           <label class="form-check-label position-relative w-100" for="check1">
-    By Skills
-    <span class="material-icons position-absolute end-0">psychology</span>
-</label>
+            By Skills
+            <span class="material-icons position-absolute end-0">psychology</span>
+          </label>
         </div>
       </li>
       <li>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="" id="check2" v-model="objectif" @change="emits('objectif', objectif)" />
+          <input class="form-check-input" type="checkbox" value="" id="check2" v-model="objectif"
+            @change="emits('objectif', objectif)" />
           <label class="form-check-label position-relative w-100" for="check2"> By Objectifs </label>
           <span class="material-icons position-absolute end-0"> calendar_month </span>
         </div>
       </li>
       <li>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="" id="check3" v-model="project" @change="emits('project', project)" />
+          <input class="form-check-input" type="checkbox" value="" id="check3" v-model="project"
+            @change="emits('project', project)" />
           <label class="form-check-label position-relative w-100" for="check3"> By projects </label>
           <span class="material-icons position-absolute end-0"> work </span>
         </div>
       </li>
       <li>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="" id="check3" v-model="friend" @change="emits('friend', friend)"/>
+          <input class="form-check-input" type="checkbox" value="" id="check3" v-model="friend"
+            @change="emits('friend', friend)" />
           <label class="form-check-label position-relative w-100" for="check3"> By Friends </label>
           <span class="material-icons position-absolute end-0"> diversity_3 </span>
         </div>
@@ -61,13 +60,14 @@ onMounted(async () => {
     </ul>
   </div>
 </template>
-<style  scoped>
+<style scoped>
 .filter {
   width: 150px;
   background-color: var(--secondary-color);
   box-shadow: none !important;
   text-decoration: none !important;
 }
+
 .form-check {
   display: flex;
   min-height: 1.5rem;

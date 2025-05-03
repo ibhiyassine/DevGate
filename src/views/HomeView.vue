@@ -17,7 +17,7 @@ let friend = ref(false);
 
 let filtered = computed(() => {
   return activites.value.filter((activity) => {
-    if(friend.value && !followings.value.includes(activity.user)) return false;
+    if(friend.value && !followings.value.includes(activity.user.username)) return false;
     if(!skill.value && activity.type == 'skill') {
       return false;
     };
@@ -26,6 +26,19 @@ let filtered = computed(() => {
     return true;
   });
 });
+
+function findId(activity){
+  if(activity.hasOwnProperty('skill')){
+    return activity.skill.id;
+  }
+  else if(activity.hasOwnProperty('objectif')){
+    return activity.objectif.id;
+  }
+  else if(activity.hasOwnProperty('project')){
+    return activity.project.id;
+  }
+  return null;
+}
 
 onMounted(async () => {
   loading.value = true;
@@ -60,7 +73,7 @@ onMounted(async () => {
         </div>
       </div>
       <div v-else class="d-flex flex-column gap-3">
-        <activity-card v-for="(activity, index) of filtered" v-bind="activity" />
+        <activity-card v-for="(activity, index) of filtered" v-bind="activity" :key="findId(activity)"/>
       </div>
     </div>
   </main>

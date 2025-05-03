@@ -39,7 +39,7 @@ const objectivesAddedThisMonth = computed(() => {
 const recentlyModifiedObjectives = computed(() => {
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
-  
+
   return objectives.value.filter(objective => {
     const modifiedDate = objective.modifiedDate?.toDate ? objective.modifiedDate.toDate() : new Date(objective.modifiedDate);
     return modifiedDate >= thirtyDaysAgo;
@@ -51,39 +51,39 @@ const objectivesByStatus = computed(() => {
     'Completed': 0,
     'In Progress': 1,
   };
-  
+
   objectives.value.forEach(objective => {
     let statusText;
     switch (objective.status) {
-  case 0:
-    statusText = 'In Progress';
-    break;
-  case 1:
-    statusText = 'Completed';
-    break;
-  default:
-    return;
-}
-    
+      case 0:
+        statusText = 'In Progress';
+        break;
+      case 1:
+        statusText = 'Completed';
+        break;
+      default:
+        return;
+    }
+
     if (!statusCount[statusText]) statusCount[statusText] = 0;
     statusCount[statusText]++;
   });
-  
+
   return statusCount;
 });
 
-const completedObjectives = computed(() => 
+const completedObjectives = computed(() =>
   objectives.value.filter(objective => objective.status === 1).length
 );
 
 // Handle auth + fetch data
 onMounted(async () => {
-   
-      await fetchObjectives();
-      await nextTick(); // ensure canvas refs are rendered
+
+  await fetchObjectives();
+  await nextTick(); // ensure canvas refs are rendered
   initCharts();
-    
- 
+
+
 });
 
 const fetchObjectives = async () => {
@@ -95,7 +95,7 @@ const fetchObjectives = async () => {
     objectives.value = list.filter(objective => objective.id !== 'init');
     initCharts();
   } catch (error) {
-    console.error('Error fetching objectives:', error);
+
   } finally {
     loading.value = false;
   }
@@ -110,22 +110,22 @@ function initCharts() {
 
 function initStatusDistributionChart() {
   if (statusDistributionChartInstance) statusDistributionChartInstance.destroy();
-  
+
   // Get status data
   const statusData = objectivesByStatus.value;
-  
+
   const labels = Object.keys(statusData);
   const data = Object.values(statusData);
-  
+
   const ctx = statusDistributionChart.value.getContext('2d');
-  
+
   const backgroundColors = [
     'rgba(75, 192, 192, 0.7)',
-    'rgba(54, 162, 235, 0.7)', 
-    
-    
+    'rgba(54, 162, 235, 0.7)',
+
+
   ];
-  
+
   const borderColors = backgroundColors.map(color => color.replace('0.7', '1'));
 
   statusDistributionChartInstance = new Chart(ctx, {
@@ -181,28 +181,28 @@ function initMonthlyObjectivesChart() {
 
 function initObjectivesTimelineChart() {
   if (objectivesTimelineChartInstance) objectivesTimelineChartInstance.destroy();
-  
+
   // Sort objectives by creation date
   const sortedObjectives = [...objectives.value].sort((a, b) => {
     const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
     const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
     return dateA - dateB;
   });
-  
+
   // Get the most recent 10 objectives (or all if less than 10)
   const recentObjectives = sortedObjectives.slice(-10);
-  
+
   const labels = recentObjectives.map(objective => {
     const date = objective.createdAt?.toDate ? objective.createdAt.toDate() : new Date(objective.createdAt);
     return date.toLocaleDateString('en', { month: 'short', day: 'numeric' });
   });
-  
+
   // Cumulative count
   const data = [];
   for (let i = 0; i < recentObjectives.length; i++) {
     data.push(i + 1);
   }
-  
+
   const ctx = objectivesTimelineChart.value.getContext('2d');
 
   objectivesTimelineChartInstance = new Chart(ctx, {
@@ -253,7 +253,7 @@ function getMonthlyObjectivesData() {
 
     data.push(count);
   }
-  
+
   return { labels, data };
 }
 </script>
@@ -268,7 +268,7 @@ function getMonthlyObjectivesData() {
         <div class="section-card">
           <h3 class="text-lg font-medium mb-4">Status Distribution</h3>
           <div class="h-64">
-            <canvas ref="statusDistributionChart" ></canvas>
+            <canvas ref="statusDistributionChart"></canvas>
           </div>
         </div>
 
@@ -362,7 +362,8 @@ function getMonthlyObjectivesData() {
 .all {
   width: 90%;
   margin: 0 auto;
-  padding-top: 60px; /* Added space for navbar */
+  padding-top: 60px;
+  /* Added space for navbar */
 }
 
 .objectives {
