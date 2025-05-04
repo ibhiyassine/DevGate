@@ -38,7 +38,6 @@ let date_string = computed(() => {
 <template>
   <div class=" p-4 rounded-5">
     <div class="image d-flex flex-column justify-content-center align-items-center">
-      <img src="../assets/avatar.png" class="rounded-circle" height="100" width="120" />
 
       <template v-if="userInfo">
         <span class="name mt-2">{{ userInfo.username }}</span>
