@@ -33,19 +33,30 @@ function add_objective() {
 }
 
 const updateObjective = async (objectiveId) => {
+  const current = objectives.value.find(obj => obj.id === objectiveId);
+
+  if (
+    current &&
+    current.title === editedTitle.value.trim() &&
+    current.status === Number(editedStatus.value)
+  ) {
+    editingObjective.value = null;
+    return;
+  }
+
   try {
     const objectiveRef = doc(db, 'users', props.username, 'objectifs', objectiveId);
     await updateDoc(objectiveRef, {
-      title: editedTitle.value,
+      title: editedTitle.value.trim(),
       status: Number(editedStatus.value),
-      modifiedDate: new Date()
+      modifiedDate: Timestamp.fromDate(new Date())
     });
     editingObjective.value = null;
   } catch (err) {
-
     error.value = 'Failed to update objective';
   }
 };
+
 
 const deleteObjective = async (objectiveId) => {
   try {

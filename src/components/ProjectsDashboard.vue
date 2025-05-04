@@ -72,6 +72,20 @@ const cancelEditing = () => {
 };
 
 const updateProject = async (projectId) => {
+  const originalProject = projects.value.find(p => p.id === projectId);
+
+  const isTitleChanged = editedTitle.value !== originalProject.title;
+  const isDescriptionChanged = editedDescription.value !== (originalProject.description || '');
+  const isStackChanged =
+    editedStack.value.split(',').map(tech => tech.trim()).join(',') !==
+    (originalProject.stack || []).join(',');
+  const isGithubLinkChanged = editedGithubLink.value !== (originalProject.githubLink || '');
+
+  if (!isTitleChanged && !isDescriptionChanged && !isStackChanged && !isGithubLinkChanged) {
+    cancelEditing();
+    return;
+  }
+
   try {
     const projectRef = doc(db, 'users', props.username, 'projects', projectId);
     await updateDoc(projectRef, {
@@ -79,14 +93,14 @@ const updateProject = async (projectId) => {
       description: editedDescription.value,
       stack: editedStack.value.split(',').map(tech => tech.trim()),
       githubLink: editedGithubLink.value,
-      modifiedDate: new Date()
+      modifiedDate: new Date(),
     });
     editingProject.value = null;
   } catch (err) {
-
     error.value = 'Failed to update project';
   }
 };
+
 
 const deleteProject = async (projectId) => {
   try {

@@ -43,19 +43,30 @@ const cancelEditing = () => {
 };
 
 const updateSkill = async (skillId) => {
+  const current = skills.value.find(skill => skill.id === skillId);
+
+  if (
+    current &&
+    current.title === editedTitle.value.trim() &&
+    current.level === Number(editedLevel.value)
+  ) {
+    editingSkill.value = null;
+    return;
+  }
+
   try {
     const skillRef = doc(db, 'users', props.username, 'skills', skillId);
     await updateDoc(skillRef, {
-      title: editedTitle.value,
+      title: editedTitle.value.trim(),
       level: Number(editedLevel.value),
       modifiedDate: new Date()
     });
     editingSkill.value = null;
   } catch (err) {
-
     error.value = 'Failed to update skill';
   }
 };
+
 
 const deleteSkill = async (skillId) => {
   try {
