@@ -2,10 +2,9 @@ import { db, auth } from '@/firebase'
 import { authStateListener } from './authStateListener'
 import { getDoc, doc } from 'firebase/firestore'
 
-let curUser = auth.currentUser && auth.currentUser.displayName ? auth.currentUser.displayName : 'yassine'
-const userRef = doc(db, 'users', curUser)
 
 export async function getFollowings() {
+    let curUser = '';
     await authStateListener((user) => {
         if(user){
             curUser = user.displayName;
@@ -14,6 +13,7 @@ export async function getFollowings() {
             console.log("Error in finding user");
         }
     })
+    const userRef = doc(db, 'users', curUser)
   try {
     const docRef = await getDoc(userRef)
     let friends = docRef.get('followings').map((user) => user.id)
