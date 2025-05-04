@@ -185,6 +185,7 @@ onMounted(() => {
   cursor: pointer;
   margin-left: 10px;
   transition: background-color 0.2s;
+  box-shadow: none;
 }
 
 .delete-btn:hover {

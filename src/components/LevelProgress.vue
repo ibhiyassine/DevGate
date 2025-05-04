@@ -180,8 +180,8 @@ const updateHours = async () => {
   padding: 8px;
   border: 1px solid var(--secondary-color);
   border-radius: var(--border-radius);
-  background: var(--background-color);
-  color: white;
+ 
+
   text-align: center;
   font-size: 1.2em;
 }
@@ -206,11 +206,13 @@ const updateHours = async () => {
   border-radius: var(--border-radius);
   cursor: pointer;
   font-weight: 500;
+  box-shadow: none;
 }
 
 .save-btn {
   background: var(--accent-color);
   color: white;
+  box-shadow: none;
 }
 
 .cancel-btn {
