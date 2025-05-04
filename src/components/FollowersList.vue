@@ -30,12 +30,12 @@ const removeFollower = async (followerUsername) => {
   try {
     const userRef = doc(db, 'users', props.username);
     const followerRef = doc(db, 'users', followerUsername);
-    
+
     // Remove from user's followers
     await updateDoc(userRef, {
       followers: arrayRemove(followerRef)
     });
-    
+
     // Remove from follower's followings
     await updateDoc(followerRef, {
       followings: arrayRemove(userRef)
@@ -47,7 +47,7 @@ const removeFollower = async (followerUsername) => {
       props.followers.splice(index, 1);
     }
   } catch (error) {
-    console.error('Error removing follower:', error);
+
   }
 };
 
@@ -59,7 +59,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <span class="stat followers-stat"  @click="openModal" style="cursor:pointer; color: white;">
+  <span class="stat followers-stat" @click="openModal" style="cursor:pointer; color: white;">
     <span class="material-icons">group</span>
     {{ followers?.length || 0 }} Followers
   </span>
@@ -74,11 +74,8 @@ onMounted(() => {
             <span class="material-icons">person</span>
             {{ follower.id }}
           </RouterLink>
-          <button 
-            v-if="currentUser?.displayName?.toLowerCase().replace(/\s+/g, '') === props.username"
-            class="delete-btn"
-            @click="removeFollower(follower.id)"
-          >
+          <button v-if="currentUser?.displayName?.toLowerCase().replace(/\s+/g, '') === props.username"
+            class="delete-btn" @click="removeFollower(follower.id)">
             Remove
           </button>
         </li>
@@ -106,7 +103,7 @@ onMounted(() => {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -117,7 +114,7 @@ onMounted(() => {
   background: var(--primary-color);
   padding: 30px 40px;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   min-width: 300px;
   max-width: 90vw;
   position: relative;
@@ -193,4 +190,4 @@ onMounted(() => {
 .delete-btn:hover {
   background: #c82333;
 }
-</style> 
+</style>

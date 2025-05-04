@@ -34,33 +34,33 @@ onMounted(async () => {
     })
   })
 
-  await fetchUserData() 
+  await fetchUserData()
 })
 const fetchUserData = async () => {
-    
-    try {
-        loading.value = true
-        error.value = null
-        if (!currentUser.value) {
-            error.value = 'No user is currently logged in'
-            userData.value = null
-            return
-        }
-        const userDoc = await getDoc(doc(db, 'users', currentUser.value))
-        
-        if (!userDoc.exists()) {
-            error.value = 'User not found'
-            userData.value = null
-            return
-        }
-        
-        userData.value = userDoc.data()
-    } catch (err) {
-        console.error('Error fetching user data:', err)
-        error.value = 'Error loading user data'
-    } finally {
-        loading.value = false
+
+  try {
+    loading.value = true
+    error.value = null
+    if (!currentUser.value) {
+      error.value = 'No user is currently logged in'
+      userData.value = null
+      return
     }
+    const userDoc = await getDoc(doc(db, 'users', currentUser.value))
+
+    if (!userDoc.exists()) {
+      error.value = 'User not found'
+      userData.value = null
+      return
+    }
+
+    userData.value = userDoc.data()
+  } catch (err) {
+
+    error.value = 'Error loading user data'
+  } finally {
+    loading.value = false
+  }
 }
 
 watch(() => currentUser.value, fetchUserData)
@@ -73,8 +73,8 @@ watch(() => currentUser.value, fetchUserData)
     <div v-if="loading" class="loading">
       <div class="loading-spinner"></div>
       <p>Loading profile...</p>
-    </div>    
-    
+    </div>
+
     <div v-else-if="error" class="error">
       <div class="error-container">
         <div class="error-icon">!</div>
@@ -82,11 +82,11 @@ watch(() => currentUser.value, fetchUserData)
         <RouterLink to="/" class="back-link">Back to Home</RouterLink>
       </div>
     </div>
-    
+
     <div v-else-if="userData" class="user-info">
       <div class="profile-layout">
-        <ProfileInfo :userData="userData" :isDashboard="true"/>
-        
+        <ProfileInfo :userData="userData" :isDashboard="true" />
+
         <!-- Right Column - Sections -->
         <div class="profile-right">
           <div class="section-card">
@@ -100,15 +100,14 @@ watch(() => currentUser.value, fetchUserData)
           </div>
         </div>
       </div>
-     
+
 
     </div>
   </div>
-  
+
 </template>
 
 <style scoped>
-
 .profile {
   min-height: 100vh;
   background-color: var(--background-color);
@@ -135,8 +134,13 @@ watch(() => currentUser.value, fetchUserData)
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error-container {
@@ -225,5 +229,4 @@ watch(() => currentUser.value, fetchUserData)
     padding: 20px;
   }
 }
-
 </style>

@@ -3,7 +3,7 @@ import { ref, onMounted, watch, onUnmounted } from 'vue'
 import { fetchUserSubcollection } from '../composables/fetchData.js'
 import { useProjects } from '@/composables/useProjects'
 import { db } from '@/firebase'
-import { Timestamp, collection, onSnapshot, doc, updateDoc, deleteDoc,  } from 'firebase/firestore' 
+import { Timestamp, collection, onSnapshot, doc, updateDoc, deleteDoc, } from 'firebase/firestore'
 import VisualizationItemProject from './VisualizationItemProject.vue'
 
 const props = defineProps({
@@ -83,7 +83,7 @@ const updateProject = async (projectId) => {
     });
     editingProject.value = null;
   } catch (err) {
-    console.error('Error updating project:', err);
+
     error.value = 'Failed to update project';
   }
 };
@@ -93,7 +93,7 @@ const deleteProject = async (projectId) => {
     const projectRef = doc(db, 'users', props.username, 'projects', projectId);
     await deleteDoc(projectRef);
   } catch (err) {
-    console.error('Error deleting project:', err);
+
     error.value = 'Failed to delete project';
   }
 };
@@ -112,7 +112,7 @@ const setupProjectsListener = () => {
     projects.value = projects.value.filter((project) => project.id !== 'init' && project.title && project.title.trim() !== '')
     loading.value = false;
   }, (err) => {
-    console.error('Error listening to projects:', err);
+
     error.value = err.message || 'Failed to load projects';
     loading.value = false;
   });
@@ -169,10 +169,10 @@ watch(() => props.username, () => {
               <button @click="cancelEditing" class="cancel-btn">Cancel</button>
             </div>
           </div>
-          
+
         </template>
         <template v-else>
-            <div class="project-header" @click="toggleProject(project.id)">
+          <div class="project-header" @click="toggleProject(project.id)">
             <div class="project-icon">
               <span class="material-icons">{{ project.icon || 'folder' }}</span>
             </div>
@@ -181,8 +181,8 @@ watch(() => props.username, () => {
               {{ expandedProjects.has(project.id) ? 'expand_less' : 'expand_more' }}
             </span>
           </div>
-          
-          </template>
+
+        </template>
 
         <div v-if="expandedProjects.has(project.id) && editingProject != project.id" class="project-content">
           <p class="project-description">{{ project.description || 'No description available' }}</p>
@@ -192,12 +192,7 @@ watch(() => props.username, () => {
             }}</span>
           </div>
           <div class="project-links">
-            <a
-              v-if="project.githubLink"
-              :href="project.githubLink"
-              target="_blank"
-              class="github-btn"
-            >
+            <a v-if="project.githubLink" :href="project.githubLink" target="_blank" class="github-btn">
               <span class="material-icons">code</span> GitHub
             </a>
           </div>
@@ -224,10 +219,10 @@ watch(() => props.username, () => {
             </div>
           </div>
         </div>
-  
+
       </div>
       <RouterLink :to="`/projectVisualization/${username}`">Visualization</RouterLink>
-      
+
     </div>
 
     <p v-else>No projects listed</p>
@@ -235,7 +230,8 @@ watch(() => props.username, () => {
 </template>
 
 <style scoped>
-.edit-input, .edit-textarea {
+.edit-input,
+.edit-textarea {
   padding: 8px;
   border: 1px solid var(--secondary-color);
   border-radius: var(--border-radius);
@@ -256,7 +252,8 @@ watch(() => props.username, () => {
   margin-top: 10px;
 }
 
-.save-btn, .cancel-btn {
+.save-btn,
+.cancel-btn {
   padding: 8px 16px;
   border: none;
   border-radius: var(--border-radius);
@@ -317,6 +314,7 @@ watch(() => props.username, () => {
   cursor: pointer;
   color: gray;
 }
+
 .projects-section {
   margin-top: 20px;
 }
@@ -339,6 +337,7 @@ button {
   gap: 8px;
   margin-bottom: 8px;
 }
+
 .stack-chip {
   background: #e3f2fd;
   color: #1976d2;
@@ -346,9 +345,11 @@ button {
   padding: 2px 10px;
   font-size: 0.85em;
 }
+
 .project-links {
   margin: 10px 0;
 }
+
 .github-btn {
   display: inline-flex;
   align-items: center;
@@ -361,9 +362,11 @@ button {
   font-size: 0.95em;
   transition: background 0.2s;
 }
+
 .github-btn:hover {
   background: #444d56;
 }
+
 .project-dates {
   display: flex;
   gap: 15px;
@@ -371,6 +374,7 @@ button {
   font-size: 0.92em;
   margin-top: 8px;
 }
+
 .date-info {
   display: flex;
   align-items: center;
@@ -414,21 +418,25 @@ button {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   overflow: hidden;
 }
+
 .style {
   color: rgb(230, 108, 108);
   margin-left: auto;
   cursor: pointer;
 }
+
 .style:hover {
   color: red;
   cursor: pointer;
 }
+
 .style2 {
   color: rgb(132, 222, 132);
   margin-left: auto;
   cursor: pointer;
 }
+
 .style2:hover {
   color: green;
 }
-</style> 
+</style>

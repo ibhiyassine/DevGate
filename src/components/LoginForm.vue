@@ -12,7 +12,7 @@ const auth = getAuth();
 const isLogin = computed(() => route.path === '/login')
 
 const email = ref('')
-const FullName=ref('')
+const FullName = ref('')
 const password = ref('')
 const username = ref('')
 const showPassword = ref(false)
@@ -42,14 +42,14 @@ async function submitLogReg() {
           // Signed up 
           const user = userCredential.user;
           await updateProfile(user, { displayName: username.value });
-          console.log("User created", user);
-          await addUsername(username.value, email.value,FullName.value);
+
+          await addUsername(username.value, email.value, FullName.value);
           router.replace(`/`);
           // ...
         })
         .catch((error) => {
           errorMessage.value = error.message;
-          console.log("Error in creating user", errorMessage.value);
+
           // ..
         });
     }
@@ -63,7 +63,7 @@ async function submitLogReg() {
 <template>
   <div class="page-container">
     <div class="navbar">
-        <div class="auth-tabs ms-auto">
+      <div class="auth-tabs ms-auto">
         <button class="tab-btn" :class="{ active: !isLogin }" @click="router.push('/register')">
           Sign up
         </button>
@@ -84,7 +84,7 @@ async function submitLogReg() {
             <label for="username">Username</label>
             <input id="username" type="text" v-model="username" placeholder="Enter your username" required />
           </div>
-          
+
           <template v-if="!isLogin">
             <div class="form-group">
               <label for="email">Email</label>
@@ -95,13 +95,14 @@ async function submitLogReg() {
               <input id="FullName" type="FullName" v-model="FullName" placeholder="Enter your full name" required />
             </div>
           </template>
-          
+
           <div class="form-group">
             <div class="password-header">
               <label for="password">Password</label>
             </div>
             <div class="password-input">
-              <input id="password" :type="showPassword ? 'text' : 'password'" v-model="password" placeholder="Enter your password" required />
+              <input id="password" :type="showPassword ? 'text' : 'password'" v-model="password"
+                placeholder="Enter your password" required />
               <button type="button" class="toggle-password" @click="showPassword = !showPassword"
                 :aria-label="showPassword ? 'Hide password' : 'Show password'">
                 <svg v-if="!showPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 3 24 24"
@@ -153,13 +154,13 @@ async function submitLogReg() {
 }
 
 .navbar {
-    display: flex;
+  display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
   background-color: rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  min-height: 80px; 
+  min-height: 80px;
 }
 
 .logo {
@@ -384,7 +385,4 @@ async function submitLogReg() {
 input::placeholder {
   color: rgba(255, 255, 255, 0.3);
 }
-
-
-
 </style>

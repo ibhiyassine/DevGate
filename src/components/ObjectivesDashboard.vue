@@ -19,14 +19,14 @@ const editedTitle = ref('');
 const editedStatus = ref('0');
 const { showObjectiveForm, newObjective, addObjective } = useObjectives(() => props.username)
 
-function add_objective(){
-  if(newObjective.value.title.trim()){
+function add_objective() {
+  if (newObjective.value.title.trim()) {
     objectives.value.push({
-        ...newObjective.value,
-        status: Number(newObjective.value.status),
-        createdAt: Timestamp.fromDate(new Date()),
-        modifiedDate: Timestamp.fromDate(new Date()),
-      });
+      ...newObjective.value,
+      status: Number(newObjective.value.status),
+      createdAt: Timestamp.fromDate(new Date()),
+      modifiedDate: Timestamp.fromDate(new Date()),
+    });
     addObjective();
   }
 
@@ -42,7 +42,7 @@ const updateObjective = async (objectiveId) => {
     });
     editingObjective.value = null;
   } catch (err) {
-    console.error('Error updating objective:', err);
+
     error.value = 'Failed to update objective';
   }
 };
@@ -52,7 +52,7 @@ const deleteObjective = async (objectiveId) => {
     const objectiveRef = doc(db, 'users', props.username, 'objectifs', objectiveId);
     await deleteDoc(objectiveRef);
   } catch (err) {
-    console.error('Error deleting objective:', err);
+
     error.value = 'Failed to delete objective';
   }
 };
@@ -73,7 +73,7 @@ const setupObjectivesListener = () => {
   unsubscribe = onSnapshot(objectivesRef, (snapshot) => {
     objectives.value = snapshot.docs.map(doc => {
       const data = doc.data();
-      console.log('Objective data:', data);
+
       return {
         id: doc.id,
         ...data
@@ -82,7 +82,7 @@ const setupObjectivesListener = () => {
     objectives.value = objectives.value.filter((objective) => objective.id !== 'init' && objective.title && objective.title.trim() !== '')
     loading.value = false;
   }, (err) => {
-    console.error('Error listening to objectives:', err);
+
     error.value = err.message || 'Failed to load objectives';
     loading.value = false;
   });
@@ -117,17 +117,9 @@ watch(() => props.username, () => {
     <div v-if="showObjectiveForm" class="add-form">
       <input v-model="newObjective.title" placeholder="Objective Title" />
       <div class="form-check form-switch">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          role="switch"
-          id="switchCheckChecked"
-          v-model="newObjective.status"
-          checked
-        />
-        <label class="form-check-label" for="switchCheckChecked"
-          >Completed</label
-        >
+        <input class="form-check-input" type="checkbox" role="switch" id="switchCheckChecked"
+          v-model="newObjective.status" checked />
+        <label class="form-check-label" for="switchCheckChecked">Completed</label>
       </div>
       <button @click="add_objective">Save Objective</button>
     </div>
@@ -140,22 +132,15 @@ watch(() => props.username, () => {
     </div>
 
     <div v-else-if="objectives.length > 0">
-      <div
-        v-for="objective in objectives"
-        :key="objective.id"
-        class="objective-item"
-        :class="{ completed: objective.status === 1 }"
-      >
+      <div v-for="objective in objectives" :key="objective.id" class="objective-item"
+        :class="{ completed: objective.status === 1 }">
         <div class="objective-header">
           <div class="objective-left">
             <span class="material-icons status-icon" @click="update(objective)">
               {{ objective.status === 1 ? 'check_circle' : 'radio_button_unchecked' }}
             </span>
             <h4>{{ objective.title }}</h4>
-            <span
-              class="objective-badge"
-              :class="objective.status === 1 ? 'completed' : 'in-progress'"
-            >
+            <span class="objective-badge" :class="objective.status === 1 ? 'completed' : 'in-progress'">
               {{ objective.status === 1 ? 'completed' : 'in progress' }}
             </span>
           </div>
@@ -240,7 +225,7 @@ watch(() => props.username, () => {
   font-size: 22px;
 }
 
-.status-icon:hover{
+.status-icon:hover {
   cursor: pointer;
 }
 
@@ -266,7 +251,7 @@ h4 {
   font-weight: 500;
 }
 
-.objective-badge:hover{
+.objective-badge:hover {
   cursor: pointer;
 }
 
@@ -305,8 +290,9 @@ button {
   margin-left: auto;
   cursor: pointer;
 }
+
 .style:hover {
   color: red;
   cursor: pointer;
 }
-</style> 
+</style>

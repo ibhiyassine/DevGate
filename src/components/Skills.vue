@@ -54,7 +54,7 @@ const updateSkill = async (skillId) => {
     });
     editingSkill.value = null;
   } catch (err) {
-    console.error('Error updating skill:', err);
+
     error.value = 'Failed to update skill';
   }
 };
@@ -66,7 +66,7 @@ const deleteSkill = async (skillId) => {
     skills.value = skills.value
       .filter(skill => skill.id !== "init")
   } catch (err) {
-    console.error('Error deleting skill:', err);
+
     error.value = 'Failed to delete skill';
   }
 };
@@ -84,7 +84,7 @@ const setupSkillsListener = () => {
     }));
     loading.value = false;
   }, (err) => {
-    console.error('Error listening to skills:', err);
+
     error.value = err.message || 'Failed to load skills';
     loading.value = false;
   });
@@ -120,8 +120,8 @@ watch(() => props.username, () => {
     <div v-else-if="validSkills.length > 0">
       <div v-for="skill in validSkills" :key="skill.id" class="skill-card">
         <div class="skill-icon">
-            <span class="material-icons">code</span>
-          </div>
+          <span class="material-icons">code</span>
+        </div>
         <div class="skill-content">
           <div class="skill-header">
 

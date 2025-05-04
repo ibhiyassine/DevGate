@@ -10,21 +10,19 @@ export const cld = new Cloudinary({
 })
 
 export async function getPfp(username) {
-  const publicId = 'users/' + username;
+  const publicId = 'users/' + username
   try {
-    const response = await fetch(`https://res.cloudinary.com/devgate/image/upload/${publicId}.png`);
+    const response = await fetch(`https://res.cloudinary.com/devgate/image/upload/${publicId}.png`)
     if (response.ok) {
-      const myImg = cld.image(publicId);
-      myImg.format('png');
-      myImg.resize(fill().width(250).height(250));
-      console.log(myImg);
-      return myImg;
+      const myImg = cld.image(publicId)
+      myImg.format('png')
+      myImg.resize(fill().width(250).height(250))
+
+      return myImg
     } else {
-      console.warn(`Image not found for username: ${username}`);
-      return null;
+      return null
     }
   } catch (error) {
-    console.error('Error checking image existence:', error);
-    return null;
+    return null
   }
 }

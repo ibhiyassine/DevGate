@@ -65,7 +65,6 @@ const updateBio = async () => {
     })
     isEditingBio.value = false
   } catch (err) {
-    console.error('Error updating bio:', err)
   }
 }
 
@@ -79,7 +78,6 @@ const updateHours = async () => {
     currentHours.value = parseInt(editedHours.value)
     isEditingHours.value = false
   } catch (err) {
-    console.error('Error updating programming hours:', err)
   }
 }
 
@@ -88,22 +86,22 @@ const setupUserListener = async () => {
     // Create a direct CloudinaryImage for the user
     const publicId = 'users/' + props.userData.username;
     // Check if the image exists first
-    const response = await fetch(`https://res.cloudinary.com/devgate/image/upload/${publicId}.png`);
-    
+    const response = await fetch(`https://res.cloudinary.com/devgate/image/upload/${publicId}`);
+
     if (response.ok) {
       // Image exists, create a CloudinaryImage instance
       const myImg = cld.image(publicId);
       myImg.format('png');
-      
+
       // Set the image
       userPfp.value = myImg;
       imageLoaded.value = true;
-      console.log("User profile picture loaded successfully:", userPfp.value);
+
     } else {
-      console.warn('No profile picture found for user:', props.userData.username);
+
       imageLoaded.value = false;
     }
-    
+
     // Continue with user data listener
     const userRef = doc(db, 'users', props.userData.username)
     unsubscribe = onSnapshot(userRef, (doc) => {
@@ -113,21 +111,21 @@ const setupUserListener = async () => {
       }
     })
   } catch (error) {
-    console.error('Error loading profile picture:', error);
+
     imageLoaded.value = false;
   }
 }
 
 const handleFollow = (username) => {
   const followers = Array.isArray(props.userData.followers) ? [...props.userData.followers] : [];
-  
+
   const existingFollower = followers.find(follower => follower.id === username);
-  
+
   if (!existingFollower) {
     followers.push({ id: username });
-    
+
     props.userData.followers = followers;
-    
+
     if (props.userData.followersCount === undefined) {
       props.userData.followersCount = 1;
     } else {
@@ -139,9 +137,9 @@ const handleFollow = (username) => {
 const handleUnfollow = (username) => {
   if (Array.isArray(props.userData.followers)) {
     const followers = props.userData.followers.filter(follower => follower.id !== username);
-    
+
     props.userData.followers = followers;
-    
+
     if (props.userData.followersCount > 0) {
       props.userData.followersCount--;
     }
@@ -167,10 +165,11 @@ onUnmounted(() => {
       <div class="profile-avatar">
         <div @click="openWidget = true">
           <template v-if="imageLoaded && userPfp">
-            <AdvancedImage :cldImg="userPfp" style="width: 120px; height: 120px;" class="border border-2 border-info rounded-circle avatar" />
+            <AdvancedImage :cldImg="userPfp" style="width: 120px; height: 120px;"
+              class="border border-2 border-info rounded-circle" :class="{ 'avatar': isDashboard }" />
           </template>
           <template v-else>
-            <div class="avatar">
+            <div :class="{ 'avatar': isDashboard }">
               {{ userData.username ? userData.username[0].toUpperCase() : '?' }}
             </div>
           </template>
@@ -183,22 +182,14 @@ onUnmounted(() => {
         <h1>{{ userData.fullname }}</h1>
         <div class="username-section">
           <span class="username-badge">@{{ userData.username }}</span>
-          <Follow 
-            v-if="!isDashboard && currentUser" 
-            :targetUsername="userData.username" 
+          <Follow v-if="!isDashboard && currentUser" :targetUsername="userData.username"
             :currentUsername="currentUser.displayName.toLowerCase().replace(/\s+/g, '')"
             @follow="handleFollow(currentUser.displayName.toLowerCase().replace(/\s+/g, ''))"
-            @unfollow="handleUnfollow(currentUser.displayName.toLowerCase().replace(/\s+/g, ''))"
-          />
+            @unfollow="handleUnfollow(currentUser.displayName.toLowerCase().replace(/\s+/g, ''))" />
         </div>
         <div class="bio-section">
           <template v-if="isEditingBio">
-            <input 
-              v-model="editedBio" 
-              class="bio-edit" 
-              placeholder="Enter your bio"
-              rows="3"
-            >
+            <input v-model="editedBio" class="bio-edit" placeholder="Enter your bio" rows="3">
             <div class="bio-actions">
               <button @click="updateBio" class="save-btn">Save</button>
               <button @click="cancelEditingBio" class="cancel-btn">Cancel</button>
@@ -213,17 +204,12 @@ onUnmounted(() => {
           </template>
         </div>
         <div class="profile-stats">
-          <FollowersList 
-            :followers="userData.followers || []" 
-            :username="userData.username"
-          />
-          <FollowingsList 
-            :followings="userData.followings || []" 
-            :username="userData.username"
-          />
+          <FollowersList :followers="userData.followers || []" :username="userData.username" />
+          <FollowingsList :followings="userData.followings || []" :username="userData.username" />
           <span class="stat">
             <span class="material-icons">calendar_today</span>
-            Member since {{ userData.createdAt?.toDate ? userData.createdAt.toDate().toLocaleDateString() : (userData.createdAt || 'N/A') }}
+            Member since {{ userData.createdAt?.toDate ? userData.createdAt.toDate().toLocaleDateString() :
+              (userData.createdAt || 'N/A') }}
           </span>
         </div>
 
@@ -233,11 +219,7 @@ onUnmounted(() => {
       </div>
     </div>
     <div class="level-section">
-      <LevelProgress 
-        :hours="currentHours" 
-        :username="userData.username"
-        :isDashboard="isDashboard"
-      />
+      <LevelProgress :hours="currentHours" :username="userData.username" :isDashboard="isDashboard" />
     </div>
   </div>
 </template>
@@ -255,7 +237,7 @@ onUnmounted(() => {
   box-shadow: var(--shadow);
 }
 
-.avatar:hover{
+.avatar:hover {
   cursor: pointer;
   opacity: 0.6;
 }
@@ -307,6 +289,8 @@ onUnmounted(() => {
 
 .bio {
   color: var(--dark-color);
+  overflow-wrap: break-word;
+  text-overflow: ellipsis;
   font-size: 1.1em;
   line-height: 1.6;
   margin: 0;
@@ -323,6 +307,7 @@ onUnmounted(() => {
   line-height: 1.6;
   resize: vertical;
   min-height: 100px;
+  transform: translateX(0.5rem);
   background-color: #ececec;
 }
 
@@ -333,7 +318,8 @@ onUnmounted(() => {
   margin-top: 10px;
 }
 
-.save-btn, .cancel-btn {
+.save-btn,
+.cancel-btn {
   padding: 8px 16px;
   border: none;
   border-radius: var(--border-radius);
@@ -360,7 +346,7 @@ onUnmounted(() => {
   border: none;
   color: var(--text-color);
   cursor: pointer;
-  
+  transform: translateX(1.2rem);
   border-radius: 4px;
   color: rgb(125, 120, 120);
   box-shadow: none !important;

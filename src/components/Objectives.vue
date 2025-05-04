@@ -49,7 +49,7 @@ const updateObjective = async (objectiveId) => {
     });
     editingObjective.value = null;
   } catch (err) {
-    console.error('Error updating objective:', err);
+
     error.value = 'Failed to update objective';
   }
 };
@@ -58,10 +58,10 @@ const deleteObjective = async (objectiveId) => {
   try {
     loading.value = true;
     objectives.value = await fetchUserSubcollection(props.username, 'objectifs');
-    objectives.value=objectives.value    
-    .filter(objective => objective.id !== "init")
+    objectives.value = objectives.value
+      .filter(objective => objective.id !== "init")
   } catch (err) {
-    console.error('Error deleting objective:', err);
+
     error.value = 'Failed to delete objective';
   }
 };
@@ -75,7 +75,7 @@ const setupObjectivesListener = () => {
   unsubscribe = onSnapshot(objectivesRef, (snapshot) => {
     objectives.value = snapshot.docs.map(doc => {
       const data = doc.data();
-      console.log('Objective data:', data);
+
       return {
         id: doc.id,
         ...data
@@ -83,7 +83,7 @@ const setupObjectivesListener = () => {
     });
     loading.value = false;
   }, (err) => {
-    console.error('Error listening to objectives:', err);
+
     error.value = err.message || 'Failed to load objectives';
     loading.value = false;
   });
@@ -108,19 +108,17 @@ watch(() => props.username, () => {
 <template>
   <div class="objectives-section">
     <h3>Objectives</h3>
-    
+
     <div v-if="loading">Loading objectives...</div>
-    
+
     <div v-else-if="error">
       <p>Error: {{ error }}</p>
       <button @click="setupObjectivesListener">Try Again</button>
     </div>
-    
+
     <div v-else-if="validObjectives.length > 0">
-      <div v-for="objective in validObjectives" 
-           :key="objective.id" 
-           class="objective-item"
-           :class="{ 'completed': objective.status === 1 }">
+      <div v-for="objective in validObjectives" :key="objective.id" class="objective-item"
+        :class="{ 'completed': objective.status === 1 }">
         <div class="objective-header">
           <div class="objective-left">
             <span class="material-icons status-icon">
@@ -160,7 +158,7 @@ watch(() => props.username, () => {
       <RouterLink :to="`/objectiveVisualization/${username}`">Visualisation</RouterLink>
 
     </div>
-    
+
     <p v-else>No objectives listed</p>
   </div>
 </template>
@@ -231,7 +229,8 @@ h4 {
   margin-left: auto;
 }
 
-.edit-btn, .delete-btn {
+.edit-btn,
+.delete-btn {
   background: none;
   border: none;
   color: var(--text-color);
@@ -272,7 +271,8 @@ h4 {
   gap: 10px;
 }
 
-.save-btn, .cancel-btn {
+.save-btn,
+.cancel-btn {
   padding: 8px 16px;
   border: none;
   border-radius: var(--border-radius);
@@ -309,4 +309,4 @@ button {
   border: none;
   cursor: pointer;
 }
-</style> 
+</style>

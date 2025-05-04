@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted,watch } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { db } from '@/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
@@ -51,18 +51,18 @@ const fetchSkills = async () => {
   try {
     loading.value = true;
     if (!user.value) {
-      console.error('No username available');
+
       return;
     }
-    
-    console.log("Fetching skills for user:", user.value);
+
+
     const skillsRef = collection(db, 'users', user.value, 'skills');
     const snapshot = await getDocs(skillsRef);
     const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     skills.value = list.filter(skill => skill.id !== 'init');
-    console.log("Skills fetched:", skills.value.length);
+
   } catch (error) {
-    console.error('Error fetching skills:', error);
+
   } finally {
     loading.value = false;
   }
@@ -72,11 +72,11 @@ const fetchSkills = async () => {
 function initCharts() {
   // Only initialize charts if we have DOM elements and data
   if (!levelDistributionChart.value || !skillsEvolutionChart.value || !skillsRadarChart.value) {
-    console.error('Chart DOM elements not ready');
+
     return;
   }
-  
-  console.log('Initializing charts');
+
+
   initLevelDistributionChart();
   initSkillsEvolutionChart();
   initSkillsRadarChart();
@@ -85,10 +85,10 @@ function initCharts() {
 function initLevelDistributionChart() {
   if (!levelDistributionChart.value) return;
   if (levelDistributionChartInstance) levelDistributionChartInstance.destroy();
-  
+
   const ctx = levelDistributionChart.value.getContext('2d');
   if (!ctx) {
-    console.error('Failed to get 2D context for level distribution chart');
+
     return;
   }
 
@@ -128,11 +128,11 @@ function initLevelDistributionChart() {
 function initSkillsEvolutionChart() {
   if (!skillsEvolutionChart.value) return;
   if (skillsEvolutionChartInstance) skillsEvolutionChartInstance.destroy();
-  
+
   const { labels, data } = getMonthlySkillsData();
   const ctx = skillsEvolutionChart.value.getContext('2d');
   if (!ctx) {
-    console.error('Failed to get 2D context for skills evolution chart');
+
     return;
   }
 
@@ -164,20 +164,20 @@ function initSkillsEvolutionChart() {
 function initSkillsRadarChart() {
   if (!skillsRadarChart.value) return;
   if (skillsRadarChartInstance) skillsRadarChartInstance.destroy();
-  
+
   // Only create chart if we have skills
   if (skills.value.length === 0) {
-    console.log('No skills available for radar chart');
+
     return;
   }
-  
+
   const topSkills = [...skills.value]
     .sort((a, b) => parseInt(b.level) - parseInt(a.level))
     .slice(0, 8);
 
   const ctx = skillsRadarChart.value.getContext('2d');
   if (!ctx) {
-    console.error('Failed to get 2D context for skills radar chart');
+
     return;
   }
 
@@ -227,21 +227,21 @@ function getMonthlySkillsData() {
 
     const count = skills.value.filter(skill => {
       if (!skill.createdAt) return false;
-      
+
       const createdAt = skill.createdAt?.toDate ? skill.createdAt.toDate() : new Date(skill.createdAt);
       return createdAt >= start && createdAt <= end;
     }).length;
 
     data.push(count);
   }
-  
-  console.log("Monthly data:", labels, data);
+
+
   return { labels, data };
 }
 
 // Call fetchSkills when component mounts
 onMounted(async () => {
-  console.log("Component mounted, username:", user.value);
+
   await fetchSkills();
   // Wait for next tick to ensure DOM is ready for charts
   setTimeout(() => {
@@ -254,7 +254,7 @@ watch(
   skills,
   () => {
     if (skills.value.length > 0) {
-      console.log("Skills changed, updating charts");
+
       initCharts();
     }
   },
@@ -270,11 +270,11 @@ watch(
       <div v-if="loading" class="loading-indicator">
         Loading skills data...
       </div>
-      
+
       <div v-else-if="skills.length === 0" class="no-data-message">
         No skills data available. Add some skills to see your statistics.
       </div>
-      
+
       <div v-else class="profile-layout">
         <!-- Skill Level Distribution -->
         <div class="section-card">
@@ -388,7 +388,8 @@ watch(
 .all {
   width: 90%;
   margin: 0 auto;
-  padding-top: 60px; /* Added space for navbar */
+  padding-top: 60px;
+  /* Added space for navbar */
 }
 
 .profile {

@@ -60,10 +60,10 @@ const updateProject = async (projectId) => {
   try {
     loading.value = true;
     projects.value = await fetchUserSubcollection(props.username, 'projects');
-    projects.value=projects.value    
-    .filter(project => project.id !== "init")
+    projects.value = projects.value
+      .filter(project => project.id !== "init")
   } catch (err) {
-    console.error('Error updating project:', err);
+
     error.value = 'Failed to update project';
   }
 };
@@ -73,7 +73,7 @@ const deleteProject = async (projectId) => {
     const projectRef = doc(db, 'users', props.username, 'projects', projectId);
     await deleteDoc(projectRef);
   } catch (err) {
-    console.error('Error deleting project:', err);
+
     error.value = 'Failed to delete project';
   }
 };
@@ -91,7 +91,7 @@ const setupProjectsListener = () => {
     }));
     loading.value = false;
   }, (err) => {
-    console.error('Error listening to projects:', err);
+
     error.value = err.message || 'Failed to load projects';
     loading.value = false;
   });
@@ -116,14 +116,14 @@ watch(() => props.username, () => {
 <template>
   <div class="projects-section">
     <h3>Projects</h3>
-    
+
     <div v-if="loading">Loading projects...</div>
-    
+
     <div v-else-if="error">
       <p>Error: {{ error }}</p>
       <button @click="setupProjectsListener">Try Again</button>
     </div>
-    
+
     <div v-else-if="validProjects.length > 0">
       <div v-for="project in validProjects" :key="project.id" class="project-card">
         <div class="project-header" @click="toggleProject(project.id)">
@@ -148,7 +148,7 @@ watch(() => props.username, () => {
             </span>
           </div>
         </div>
-        
+
         <div v-if="expandedProjects.has(project.id)" class="project-content">
           <template v-if="isDashboard && editingProject === project.id">
             <input v-model="editedTitle" class="edit-input" placeholder="Project Title" />
@@ -178,7 +178,8 @@ watch(() => props.username, () => {
             </span>
             <span v-if="project.modifiedDate" class="date-info">
               <span class="material-icons">update</span>
-              {{ project.modifiedDate.toDate ? project.modifiedDate.toDate().toLocaleDateString() : project.modifiedDate }}
+              {{ project.modifiedDate.toDate ? project.modifiedDate.toDate().toLocaleDateString() : project.modifiedDate
+              }}
             </span>
           </div>
         </div>
@@ -186,7 +187,7 @@ watch(() => props.username, () => {
       <RouterLink :to="`/projectVisualization/${username}`">Visualization</RouterLink>
 
     </div>
-    
+
     <p v-else>No projects listed</p>
   </div>
 </template>
@@ -214,6 +215,7 @@ button {
   gap: 8px;
   margin-bottom: 8px;
 }
+
 .stack-chip {
   background: #e3f2fd;
   color: #1976d2;
@@ -221,9 +223,11 @@ button {
   padding: 2px 10px;
   font-size: 0.85em;
 }
+
 .project-links {
   margin: 10px 0;
 }
+
 .github-btn {
   display: inline-flex;
   align-items: center;
@@ -236,9 +240,11 @@ button {
   font-size: 0.95em;
   transition: background 0.2s;
 }
+
 .github-btn:hover {
   background: #444d56;
 }
+
 .project-dates {
   display: flex;
   gap: 15px;
@@ -246,6 +252,7 @@ button {
   font-size: 0.92em;
   margin-top: 8px;
 }
+
 .date-info {
   display: flex;
   align-items: center;
@@ -277,7 +284,8 @@ button {
   gap: 10px;
 }
 
-.edit-btn, .delete-btn {
+.edit-btn,
+.delete-btn {
   background: none;
   border: none;
   color: var(--text-color);
@@ -312,7 +320,8 @@ button {
   margin: 10px 0;
 }
 
-.edit-input, .edit-textarea {
+.edit-input,
+.edit-textarea {
   padding: 8px;
   border: 1px solid var(--secondary-color);
   border-radius: var(--border-radius);
@@ -333,7 +342,8 @@ button {
   margin-top: 10px;
 }
 
-.save-btn, .cancel-btn {
+.save-btn,
+.cancel-btn {
   padding: 8px 16px;
   border: none;
   border-radius: var(--border-radius);
@@ -356,4 +366,4 @@ button {
   margin-bottom: 10px;
   overflow: hidden;
 }
-</style> 
+</style>

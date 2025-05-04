@@ -18,7 +18,7 @@ const cliick = ref(false);
 const { users, fetchUsers } = getusers();
 onMounted(async () => {
   await fetchUsers().then(() => {
-    console.log("users:", users.value);
+
   })
 });
 
@@ -52,8 +52,8 @@ const handleBlur = () => {
     <div class="position-relative">
       <span class="material-icons position-absolute top-50 start-0 translate-middle-y ps-2 text-muted"
         style="color: black;">search</span>
-      <input class="form-control ps-5 rounded border-0" type="text" placeholder="Search for people" style="height: 50px;"
-        v-model="search" ref="inputref" @focus="cliick = true" @blur="handleBlur"
+      <input class="form-control ps-5 rounded border-0" type="text" placeholder="Search for people"
+        style="height: 50px;" v-model="search" ref="inputref" @focus="cliick = true" @blur="handleBlur"
         @input="cliick = search.trim().length > 0" />
     </div>
 
@@ -63,10 +63,10 @@ const handleBlur = () => {
       <div v-if="filteredUsers.length">
         <h6 class="text-muted px-2 ">Users</h6>
         <SearchSuggestionItem v-for="(user, index) in filteredUsers" :key="index" :value="user.username"
-          :username="user.username"  />
+          :username="user.username" />
       </div>
 
-      
+
 
     </div>
   </div>
