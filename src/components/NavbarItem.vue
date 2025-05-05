@@ -1,6 +1,5 @@
 <script setup>
 import SearchBar from './SearchBar.vue';
-import UserInfo from './UserInfo.vue';
 import { onMounted, ref } from 'vue';
 import { authStateListener } from '@/composables/authStateListener';
 import { useRouter } from 'vue-router';

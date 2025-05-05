@@ -5,12 +5,13 @@ import Follow from './Follow.vue'
 import LevelProgress from './LevelProgress.vue'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { db } from '../firebase'
-import { doc, updateDoc, onSnapshot } from 'firebase/firestore'
+import { doc, updateDoc, onSnapshot, collection, getDocs } from 'firebase/firestore'
 import { authStateListener } from '@/composables/authStateListener'
 import { getPfp, cld } from '../../cloudinary'
 import { AdvancedImage } from '@cloudinary/vue';
 import UploadPfp from './UploadPfp.vue'
 import { CloudinaryImage } from '@cloudinary/url-gen';
+import { useResume } from '@/composables/useResume'
 
 const props = defineProps({
   userData: {
@@ -145,6 +146,19 @@ const handleUnfollow = (username) => {
     }
   }
 }
+
+// Initialize the resume composable
+const { generateResume } = useResume()
+
+// Handle generate resume button click
+const handleGenerateResume = async () => {
+  try {
+    await generateResume(props.userData, currentBio.value)
+  } catch (error) {
+    alert(error.message)
+  }
+}
+
 onMounted(() => {
   setupUserListener()
   authStateListener((user) => {
@@ -212,6 +226,11 @@ onUnmounted(() => {
               (userData.createdAt || 'N/A') }}
           </span>
         </div>
+
+        <button @click="handleGenerateResume" class="resume-btn" style="box-shadow: none;">
+          <span class="material-icons">description</span>
+          Generate Resume
+        </button>
 
         <p class="email" v-if="!isDashboard">
           <a :href="`mailto:${userData.email}`">Contact the person!</a>
@@ -455,6 +474,30 @@ onUnmounted(() => {
 .profile-details .email a:hover {
   color: var(--dark-color);
   text-decoration: underline;
+}
+
+.resume-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.95em;
+  cursor: pointer;
+  margin: 0 auto 15px;
+  transition: background-color 0.2s;
+}
+
+.resume-btn:hover {
+  background-color: #45a049;
+}
+
+.resume-btn .material-icons {
+  font-size: 1.2em;
 }
 
 :deep(.follow-button) {
