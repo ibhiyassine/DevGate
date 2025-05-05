@@ -117,7 +117,7 @@ onMounted(async () => {
 
 .cardx {
     width: 50rem;
-    background-color: var(--primary-color);
+    background-color: white;
     padding: 0.5rem;
 }
 

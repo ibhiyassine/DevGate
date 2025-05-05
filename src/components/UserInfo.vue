@@ -1,173 +1,146 @@
 <script setup>
-import { getUserInfo } from "@/composables/getUserInfo";
-import { ref, onBeforeMount, computed } from "vue";
-import { get_date_string } from "../composables/dateString";
-import { logout } from "@/composables/userLogout";
-import { useRouter } from "vue-router";
-const router = useRouter();
+import { ref, onMounted } from 'vue';
+import { fetchUser } from '@/composables/fetchData';
+import { useRouter } from 'vue-router';
+
 const props = defineProps({
   username: {
     type: String,
-    required: true,
-    default: "yassine"
+    required: true
   }
-})
-
-async function logout2() {
-  const confirmed = confirm("Are you sure you want to log out?");
-  if (confirmed) {
-    await logout();
-    router.replace("/");
-
-
-  }
-}
-
-const userInfo = ref(null);
-onBeforeMount(async () => {
-  userInfo.value = await getUserInfo(props.username);
-
-
 });
 
-let date_string = computed(() => {
-  return get_date_string(userInfo.value.createdAt);
+const router = useRouter();
+const user = ref(null);
+const loading = ref(true);
+
+onMounted(async () => {
+  try {
+    if (props.username) {
+      loading.value = true;
+      user.value = await fetchUser(props.username);
+    }
+  } catch (error) {
+    console.error('Error fetching user info:', error);
+  } finally {
+    loading.value = false;
+  }
 });
+
+const navigateToProfile = () => {
+  router.push(`/profile/${props.username}`);
+};
 </script>
 
 <template>
-  <div class=" p-4 rounded-5">
-    <div class="image d-flex flex-column justify-content-center align-items-center">
-
-      <template v-if="userInfo">
-        <span class="name mt-2">{{ userInfo.username }}</span>
-        <span class="idd">{{ userInfo.email }}</span>
-
-
-
-        <div class="gap-3 mt-3 icons d-flex flex-row justify-content-center align-items-center">
-          <span><i class="fa fa-twitter"></i></span>
-          <span><i class="fa fa-facebook-f"></i></span>
-          <span><i class="fa fa-instagram"></i></span>
-          <span><i class="fa fa-linkedin"></i></span>
+  <div class="user-info-container p-3">
+    <div v-if="loading" class="text-center">
+      <div class="spinner-border spinner-border-sm" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    
+    <div v-else-if="user" class="d-flex flex-column">
+      <div class="d-flex align-items-center mb-3">
+        <div class="user-avatar">
+          {{ user.username ? user.username[0].toUpperCase() : '?' }}
         </div>
-
-        <div>
-          <span class="join" v-show="!userInfo.isAdmin">Joined at {{ date_string }}</span>
+        <div class="ms-3">
+          <h5 class="mb-0">{{ user.username }}</h5>
+          <small class="text-muted">{{ user.email || 'No email provided' }}</small>
         </div>
-        <div class="d-flex mt-2">
-          <button type="button" class="logout-btn-outline" @click="logout2">Log out</button>
+      </div>
+      
+      <div class="user-stats mb-3">
+        <div class="stat-item">
+          <span class="material-icons">psychology</span>
+          <div>
+            <strong>{{ user.skills?.length || 0 }}</strong>
+            <span>Skills</span>
+          </div>
         </div>
-      </template>
-
-      <template v-else>
-        <span class="text-muted" style="color:#1d3c45">Loading...</span>
-      </template>
+        <div class="stat-item">
+          <span class="material-icons">folder</span>
+          <div>
+            <strong>{{ user.projects?.length || 0 }}</strong>
+            <span>Projects</span>
+          </div>
+        </div>
+      </div>
+      
+      <button @click="navigateToProfile" class="view-profile-btn">
+        View Full Profile
+      </button>
+    </div>
+    
+    <div v-else class="text-center text-muted">
+      User not found
     </div>
   </div>
-
 </template>
 
 <style scoped>
-* {
-  margin: 0;
-  padding: 0
+.user-info-container {
+  border-radius: 8px;
 }
 
-body {
-  background-color: #000
-}
-
-.card {
-  width: 350px;
-  background-color: white;
-  cursor: pointer;
-  transition: all 0.5s;
-
-}
-
-.image img {
-  transition: all 0.5s
-}
-
-.card:hover .image img {
-  transform: scale(1.1)
-}
-
-.logout-btn-outline {
-  background-color: transparent;
-  color: #e63946;
-  border: 2px solid #e63946;
-  padding: 10px 24px;
-  border-radius: 30px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: none !important;
-}
-
-.logout-btn-outline:hover {
-  background-color: #e63946;
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-color, #1d3c45), var(--dark-color, #0b232a));
   color: white;
-}
-
-
-.name {
-  font-size: 22px;
-  font-weight: bold;
-  color: #1d3c45;
-
-}
-
-.idd {
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 600;
-  color: #1d3c45;
+  font-size: 18px;
 }
 
-.idd1 {
-  font-size: 12px
+.user-stats {
+  display: flex;
+  gap: 15px;
 }
 
-.number {
-  font-size: 22px;
-  font-weight: bold
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.follow {
+.stat-item .material-icons {
+  color: var(--secondary-color, #1d3c45);
+  font-size: 20px;
+}
+
+.stat-item div {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-item strong {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.stat-item span {
   font-size: 12px;
-  font-weight: 500;
-  color: #444444
+  color: #777;
 }
 
-.btn1 {
-  height: 40px;
-  width: 150px;
+.view-profile-btn {
+  background-color: var(--secondary-color, #1d3c45);
+  color: white;
   border: none;
-  background-color: #d2601a;
-  color: #1d3c45;
-  font-size: 19px;
-  font-weight: bold;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-.text span {
-  font-size: 13px;
-  color: #545454;
-  font-weight: 500
-}
-
-.icons i {
-  font-size: 19px
-}
-
-hr .new1 {
-  border: 1px solid
-}
-
-.join {
-  font-size: 13px;
-  color: #1d3c45;
-  font-weight: bold
+.view-profile-btn:hover {
+  background-color: var(--accent-color, #0b232a);
 }
 </style>

@@ -26,6 +26,10 @@ const switchMode = () => {
   }
 }
 
+function isAlphanumeric(str) {
+  return /^[a-z0-9]+$/.test(str);
+}
+
 async function submitLogReg() {
   if (!username.value || !password.value || (!isLogin.value && !email.value)) {
     errorMessage.value = "Please fill the form correctly"
@@ -36,7 +40,10 @@ async function submitLogReg() {
     router.replace(`/`);
   }
   else {
-    if (await checkUsername(username.value)) {
+    if(!isAlphanumeric(username.value)){
+      errorMessage.value = "Username can only have alphanumerical characters. And no capital letters.";
+    }
+    else if (await checkUsername(username.value)) {
       createUserWithEmailAndPassword(auth, email.value, password.value)
         .then(async (userCredential) => {
           // Signed up 
